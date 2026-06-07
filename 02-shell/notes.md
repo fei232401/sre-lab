@@ -538,3 +538,770 @@ SRE排障核心思路：
 不要直接猜测。
 
 先观察，再验证。
+Phase 5.1 - While 基础
+
+## Phase 5.1 - While 基础
+
+作用：
+
+当条件成立时持续执行。
+
+语法：
+
+while [ 条件 ]
+do
+    命令
+done
+
+案例：
+
+count=1
+
+while [ $count -le 5 ]
+do
+    echo "Count: $count"
+    count=$((count + 1))
+done
+
+输出：
+
+Count: 1
+Count: 2
+Count: 3
+Count: 4
+Count: 5
+
+知识点：
+
+-le  小于等于
+
+Shell算术运算：
+
+count=$((count + 1))
+
+不能写：
+
+count=count+1
+
+理解：
+
+while适用于：
+
+- 不确定执行次数
+- 满足条件持续执行
+- 服务轮询
+- 文件逐行处理
+
+区别：
+
+for：
+已知列表
+
+while：
+条件驱动
+
+
+---
+
+Phase 5.2 - Function
+
+## Phase 5.2 - Function（函数）
+
+作用：
+
+给一段代码起名字。
+
+语法：
+
+func_name() {
+
+    命令
+
+}
+
+调用：
+
+func_name
+
+案例：
+
+show_time() {
+
+    date
+
+}
+
+show_time
+
+输出：
+
+当前时间
+
+--------------------------------------------------
+
+运维案例：
+
+check_service() {
+
+    systemctl is-active nginx
+
+}
+
+check_service
+
+输出：
+
+active
+
+--------------------------------------------------
+
+作用：
+
+- 代码复用
+- 逻辑清晰
+- 方便维护
+
+真实运维脚本常见结构：
+
+check_cpu
+check_memory
+check_disk
+check_service
+
+主流程非常清晰
+
+
+---
+
+Phase 5.3 - Function Args
+
+## Phase 5.3 - Function 参数
+
+函数也有：
+
+$1
+$2
+$3
+
+案例：
+
+say_hello() {
+
+    echo "Hello $1"
+
+}
+
+say_hello fei
+
+输出：
+
+Hello fei
+
+--------------------------------------------------
+
+运维案例：
+
+check_service() {
+
+    systemctl is-active "$1"
+
+}
+
+check_service nginx
+
+输出：
+
+active
+
+--------------------------------------------------
+
+理解：
+
+函数内部：
+
+$1
+
+表示：
+
+函数调用时的第一个参数。
+
+例如：
+
+check_service nginx
+
+则：
+
+$1=nginx
+
+--------------------------------------------------
+
+注意：
+
+函数里的$1
+
+不是
+
+脚本最外层的$1
+
+二者作用域不同。
+
+脚本参数需要主动传递给函数：
+
+check_service "$1"
+
+
+---
+
+Phase 5.4 - Function + For
+
+## Phase 5.4 - Function + For
+
+目标：
+
+批量检查多个服务。
+
+案例：
+
+check_service() {
+
+    echo "Checking $1"
+
+    systemctl is-active "$1"
+
+}
+
+for service in nginx ssh docker
+do
+    check_service "$service"
+done
+
+--------------------------------------------------
+
+执行流程：
+
+第一次：
+
+service=nginx
+
+第二次：
+
+service=ssh
+
+第三次：
+
+service=docker
+
+--------------------------------------------------
+
+意义：
+
+函数负责单次检查。
+
+for负责批量执行。
+
+组合后形成：
+
+批量巡检脚本。
+
+--------------------------------------------------
+
+典型运维场景：
+
+检查：
+
+- nginx
+- ssh
+- docker
+- mysql
+- redis
+
+无需重复写代码。
+
+
+---
+
+Phase 5.5 - Case
+
+## Phase 5.5 - Case
+
+作用：
+
+多选一判断。
+
+适用于：
+
+start
+stop
+restart
+status
+
+这种固定选项。
+
+--------------------------------------------------
+
+语法：
+
+case "$1" in
+
+start)
+    echo "Starting"
+    ;;
+
+stop)
+    echo "Stopping"
+    ;;
+
+status)
+    echo "Checking"
+    ;;
+
+*)
+    echo "Unknown"
+    ;;
+
+esac
+
+--------------------------------------------------
+
+执行：
+
+bash case_demo.sh start
+
+输出：
+
+Starting
+
+--------------------------------------------------
+
+bash case_demo.sh stop
+
+输出：
+
+Stopping
+
+--------------------------------------------------
+
+bash case_demo.sh abc
+
+输出：
+
+Unknown
+
+--------------------------------------------------
+
+与if区别：
+
+if：
+
+适合条件判断
+
+例如：
+
+if [ "$status" = "active" ]
+
+--------------------------------------------------
+
+case：
+
+适合固定选项判断
+
+例如：
+
+start
+stop
+restart
+status
+
+--------------------------------------------------
+
+真实运维脚本经常使用：
+
+./service.sh start
+
+./service.sh stop
+
+./service.sh status
+
+
+---
+
+这一阶段你踩过的坑（建议写入 Notes）
+
+## Phase 5 常见错误
+
+1. 变量大小写错误
+
+status
+
+不等于
+
+Status
+
+--------------------------------------------------
+
+2. if 忘记 fi
+
+if
+then
+else
+
+必须：
+
+fi
+
+--------------------------------------------------
+
+3. 函数忘记 }
+
+func() {
+
+}
+
+必须闭合
+
+--------------------------------------------------
+
+4. service 和 Service 混用
+
+Linux变量区分大小写
+
+--------------------------------------------------
+
+5. 使用bash -x调试
+
+bash -x script.sh
+
+查看执行过程
+
+--------------------------------------------------
+
+6. 使用bash -n检查语法
+
+bash -n script.sh
+
+检查脚本结构是否正确
+
+
+---
+## Phase 5.6 - While 循环
+
+### 1. While 基础
+
+作用：
+
+当条件成立时，持续执行循环体。
+
+语法：
+
+while [ 条件 ]
+do
+    命令
+done
+
+示例：
+
+count=1
+
+while [ $count -le 5 ]
+do
+    echo "Count: $count"
+    count=$((count + 1))
+done
+
+输出：
+
+Count: 1
+Count: 2
+Count: 3
+Count: 4
+Count: 5
+
+理解：
+
+1. 先判断条件
+2. 条件成立进入循环
+3. 执行循环体
+4. 回到条件判断
+5. 条件不成立结束循环
+
+--------------------------------------------------
+
+### 2. 算术运算
+
+Shell变量默认是字符串。
+
+计算需要：
+
+count=$((count + 1))
+
+等价：
+
+count=count+1 （错误）
+
+正确：
+
+count=$((count + 1))
+
+示例：
+
+num=5
+
+num=$((num + 2))
+
+结果：
+
+7
+
+--------------------------------------------------
+
+### 3. 无限循环
+
+语法：
+
+while true
+do
+    命令
+done
+
+示例：
+
+while true
+do
+    echo "running..."
+    sleep 1
+done
+
+特点：
+
+会一直执行。
+
+停止：
+
+Ctrl + C
+
+--------------------------------------------------
+
+### 4. break
+
+作用：
+
+立即结束循环。
+
+示例：
+
+count=1
+
+while true
+do
+    echo $count
+
+    if [ $count -eq 5 ]
+    then
+        break
+    fi
+
+    count=$((count + 1))
+done
+
+输出：
+
+1
+2
+3
+4
+5
+
+循环结束。
+
+--------------------------------------------------
+
+### 5. continue
+
+作用：
+
+跳过本次循环剩余内容。
+
+示例：
+
+count=0
+
+while [ $count -lt 5 ]
+do
+    count=$((count + 1))
+
+    if [ $count -eq 3 ]
+    then
+        continue
+    fi
+
+    echo $count
+done
+
+输出：
+
+1
+2
+4
+5
+
+数字3被跳过。
+
+--------------------------------------------------
+
+### 6. 逐行读取文件
+
+运维高频场景。
+
+语法：
+
+while read line
+do
+    echo "$line"
+done < file.txt
+
+示例：
+
+文件：
+
+user.txt
+
+alice
+bob
+tom
+
+脚本：
+
+while read line
+do
+    echo "User: $line"
+done < user.txt
+
+输出：
+
+User: alice
+User: bob
+User: tom
+
+--------------------------------------------------
+
+### 7. 日志读取案例
+
+while read line
+do
+    ip=$(echo "$line" | awk '{print $1}')
+
+    echo "$ip"
+
+done < access.log
+
+作用：
+
+逐行读取日志并提取IP。
+
+--------------------------------------------------
+
+### 本阶段知识总结
+
+新增：
+
+- while
+- break
+- continue
+- 算术运算
+- read
+- 文件逐行处理
+
+典型场景：
+
+- 日志分析
+- 巡检脚本
+- 配置文件读取
+- 自动化运维脚本
+Phase 5.7 – Cron 定时任务
+
+作用
+
+定期执行脚本或命令
+
+运维中常用于日志清理、巡检、备份、数据同步
+
+
+
+---
+
+基础语法
+
+# 编辑当前用户 crontab
+crontab -e
+
+# crontab 文件每行格式
+* * * * * /path/to/command arg1 arg2
+
+# 星号顺序：
+分 时 日 月 周 命令
+
+
+---
+
+例子
+
+1. 每天凌晨 2 点执行 backup.sh：
+
+
+
+0 2 * * * /home/fei/sre-lab/02-shell/scripts/backup.sh
+
+2. 每 5 分钟执行 log_check.sh：
+
+
+
+*/5 * * * * /home/fei/sre-lab/02-shell/scripts/log_check.sh /home/fei/sre-lab/02-shell/scripts/sample_logs/demo_access.txt
+
+3. 每周一凌晨 3 点清理 /tmp：
+
+
+
+0 3 * * 1 rm -rf /tmp/*
+
+
+---
+
+小技巧
+
+查看当前用户 cron 表：
+
+
+crontab -l
+
+删除 cron 表：
+
+
+crontab -r
+
+cron 日志：
+
+
+cat /var/log/syslog | grep CRON
+
+使用绝对路径，避免环境变量问题
+
+
+
+---
+
+注意事项
+
+cron 默认环境简化，不加载用户 ~/.bashrc
+
+输出重定向：
+
+
+0 2 * * * /path/to/script.sh >> /home/fei/logs/backup.log 2>&1
+
+脚本权限需可执行：
+
+
+chmod +x /home/fei/sre-lab/02-shell/scripts/backup.sh
+
+
+---
