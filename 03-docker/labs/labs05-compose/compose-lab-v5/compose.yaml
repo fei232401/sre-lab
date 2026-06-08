@@ -1,0 +1,24 @@
+services:
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+      - backend
+
+  redis:
+    image: redis
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:

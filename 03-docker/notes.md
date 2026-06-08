@@ -314,6 +314,177 @@ Volume
 ---
 
 
+Lab04 总结
+
+实验目标
+
+使用 Dockerfile 构建自定义 Nginx 镜像，并返回自定义网页内容。
+
+
+---
+
+文件结构
+
+labs04-dockerfile/
+├── Dockerfile
+└── index.html
+
+
+---
+
+Dockerfile
+
+FROM nginx
+
+COPY index.html /usr/share/nginx/html/index.html
+
+
+---
+
+构建镜像
+
+docker build -t fei-nginx:v1 .
+
+注意：
+
+.
+
+表示：
+
+Build Context（构建上下文）
+
+Docker 会把当前目录发送给 Docker Engine。
+
+
+---
+
+启动容器
+
+docker run -d \
+--name fei-web \
+-p 8080:80 \
+fei-nginx:v1
+
+
+---
+
+验证
+
+curl localhost:8080
+
+成功返回自定义网页内容。
+
+
+---
+
+本实验掌握
+
+FROM
+
+指定基础镜像
+
+FROM nginx
+
+
+---
+
+COPY
+
+复制宿主机文件到镜像内部
+
+COPY index.html /usr/share/nginx/html/index.html
+
+注意：
+
+目标路径是：
+
+镜像内部路径
+
+不是宿主机路径。
+
+
+---
+
+docker build
+
+作用：
+
+Dockerfile
+    ↓
+Image
+
+
+---
+
+docker run
+
+作用：
+
+Image
+    ↓
+Container
+
+
+---
+
+本实验犯过的错误
+
+错误1
+
+docker build -t fei-nginx:v1
+
+报错：
+
+requires 1 argument
+
+原因：
+
+未指定 Build Context。
+
+正确：
+
+docker build -t fei-nginx:v1 .
+
+
+---
+
+错误2
+
+错误理解 COPY
+
+曾写：
+
+COPY index.html /~/sre-lab/...
+
+问题：
+
+Dockerfile 操作的是：
+
+镜像内部文件系统
+
+不是宿主机目录。
+
+
+---
+
+错误3
+
+混淆 Python Dockerfile 与 Nginx Dockerfile
+
+曾写：
+
+RUN pip install ...
+COPY app.py .
+CMD ["nginx","app.py"]
+
+问题：
+
+当前镜像目标是：
+
+Nginx返回静态网页
+
+不涉及 Python 应用。
+
 
 
 
