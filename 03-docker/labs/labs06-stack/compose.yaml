@@ -8,13 +8,23 @@ services:
       - mysql
     networks:
       - backend
-
-
+      - frontend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 100M
+        reservations:
+          memory: 20M
   redis:
     image: redis:alpine
     networks:
       - backend
-
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
   mysql:
     image: mysql:8
     environment:
@@ -24,7 +34,11 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - backend
-
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
   nginx:
     image: nginx:alpine
     ports:
@@ -34,9 +48,17 @@ services:
     depends_on:
       - api
     networks:
-      - backend
+      - frontend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 50M
+
 networks:
   backend:
-
+    driver: bridge
+  frontend:
+    driver: bridge
 volumes:
   mysql_data:
