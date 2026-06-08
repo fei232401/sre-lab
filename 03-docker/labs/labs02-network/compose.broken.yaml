@@ -1,0 +1,18 @@
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - frontend
+
+  web:
+    image: nginx:alpine
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
