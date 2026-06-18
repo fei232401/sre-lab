@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'git@github.com:fei232401/sre-lab.git'
+    targetRevision: main
+    path: 03-gitops-production/bootstrap # 🌟 终极套娃：监控自己所在的目录！
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
