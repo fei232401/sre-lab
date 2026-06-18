@@ -3,8 +3,6 @@ kind: DaemonSet
 metadata:
   name: promtail
   namespace: logging
-  labels:
-    app: promtail
 spec:
   selector:
     matchLabels:
@@ -17,11 +15,9 @@ spec:
       containers:
       - name: promtail
         image: grafana/promtail:2.9.2
-        args: ["-config.file=/etc/promtail/config.yml"]
         volumeMounts:
         - name: varlog
           mountPath: /var/log
-          readOnly: true
       volumes:
       - name: varlog
         hostPath:

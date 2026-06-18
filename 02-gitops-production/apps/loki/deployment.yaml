@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   name: loki
   namespace: logging
-  labels:
-    app: loki
 spec:
   replicas: 1
   selector:
@@ -18,7 +16,6 @@ spec:
       containers:
       - name: loki
         image: grafana/loki:2.9.2
-        args: ["-config.file=/etc/loki/local-config.yaml"]
         ports:
         - containerPort: 3100
 ---
@@ -31,6 +28,5 @@ spec:
   selector:
     app: loki
   ports:
-    - protocol: TCP
-      port: 3100
+    - port: 3100
       targetPort: 3100
