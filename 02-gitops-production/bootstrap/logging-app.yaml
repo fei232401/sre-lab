@@ -1,19 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: logging-stack
+  name: loki
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: 'https://grafana.github.io/helm-charts'
-    chart: loki
-    targetRevision: 5.41.4 # 使用稳定的版本
-    helm:
-      valueFiles:
-        - values.yaml
+    repoURL: 'git@github.com:fei232401/sre-lab.git'
+    targetRevision: main
+    path: 02-gitops-production/logging/loki
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring
@@ -32,12 +29,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://grafana.github.io/helm-charts'
-    chart: promtail
-    targetRevision: 6.15.4
-    helm:
-      valueFiles:
-        - values.yaml
+    repoURL: 'git@github.com:fei232401/sre-lab.git'
+    targetRevision: main
+    path: 02-gitops-production/logging/promtail
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring

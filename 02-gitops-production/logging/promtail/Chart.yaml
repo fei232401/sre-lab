@@ -1,0 +1,10 @@
+apiVersion: v2
+name: promtail-stack
+description: Umbrella chart for Promtail via ArgoCD
+type: application
+version: 1.0.0
+appVersion: "2.9.0"
+dependencies:
+  - name: promtail
+    version: "6.15.4"
+    repository: "https://grafana.github.io/helm-charts"

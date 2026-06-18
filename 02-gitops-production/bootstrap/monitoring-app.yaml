@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: 'git@github.com:fei232401/sre-lab.git'
     targetRevision: main
-    path: 03-gitops-production/monitoring
+    path: 02-gitops-production/monitoring
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring

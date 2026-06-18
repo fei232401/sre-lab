@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: 'git@github.com:fei232401/sre-lab.git'
     targetRevision: main
-    path: 03-gitops-production/apps/ai-platform
+    path: 02-gitops-production/apps/ai-platform
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: ai-platform
