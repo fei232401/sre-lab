@@ -1,0 +1,25 @@
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: 'filesystem'
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: local-path # K3s 默认的存储类，如果你改了请替换
+# 禁用不需要的组件
+read:
+  replicas: 0
+write:
+  replicas: 0
+backend:
+  replicas: 0
+gateway:
+  enabled: false
+test:
+  enabled: false
+lokiCanary:
+  enabled: false
