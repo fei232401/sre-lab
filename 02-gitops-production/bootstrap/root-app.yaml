@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: 'git@github.com:fei232401/sre-lab.git'
     targetRevision: main
-    path: 03-gitops-production/bootstrap # 🌟 终极套娃：监控自己所在的目录！
+    path: 02-gitops-production/bootstrap # 🌟 终极套娃：监控自己所在的目录！
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: argocd
