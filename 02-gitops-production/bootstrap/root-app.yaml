@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'git@github.com:fei232401/sre-lab.git'
+    repoURL: 'https://github.com/fei232401/sre-lab.git'
     targetRevision: main
-    path: 02-gitops-production/bootstrap # 🌟 终极套娃：监控自己所在的目录！
+    path: 02-gitops-production/bootstrap
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: argocd
