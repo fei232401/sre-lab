@@ -12,3 +12,13 @@ Thumbs.db
 *.key
 *.pem
 secrets/
+*-plain.yaml
+secret-plain.yaml
+
+# 压测报告 (本地产物)
+03-benchmark/report.html
+03-benchmark/results_*
+03-benchmark/__pycache__/
+03-benchmark/.venv/
+*.pyc
+__pycache__/
