@@ -1,4 +1,4 @@
-apiVersion: argoproj.io/v1alpha1
+﻿apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: loki
@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: 'https://github.com/fei232401/sre-lab.git'
     targetRevision: main
-    path: 02-gitops-production/apps/loki
+    path: sre-lab-gitops/production/apps/loki
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: logging
@@ -18,3 +18,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+

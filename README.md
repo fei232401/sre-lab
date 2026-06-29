@@ -1,168 +1,131 @@
-# 🚀 SRE Lab — K3S 高并发 AI 推理平台
+# 🚀 SRE Lab — GitHub 仓库总览
 
-> **项目驱动 · 练中学** — 从零构建生产级云原生 AI 推理平台
-
-[![K3S](https://img.shields.io/badge/K3S-v1.31-blue)](https://k3s.io/)
-[![Kubernetes](https://img.shields.io/badge/K8s-Native-326ce5)](https://kubernetes.io/)
-[![ArgoCD](https://img.shields.io/badge/ArgoCD-GitOps-ef7b4d)](https://argo-cd.readthedocs.io/)
-[![Tailscale](https://img.shields.io/badge/Tailscale-Mesh-4912FF?logo=tailscale)](https://tailscale.com/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-
----
-
-## 📖 仓库简介
-
-本仓库整合了 SRE Lab 的 GitOps 生产配置及相关子项目，包含以下内容：
-
-- **sre-lab-gitops/** — SRE Lab K3S AI 推理平台的完整部署配置（含 ArgoCD 监听的生产目录）
-- **ai-model-scheduler/** — AI Model Scheduler 统一异构调度层
-- **ai-infra-gateway/** — AI Infra Gateway（Windows 裸金属推理网关）
-- **resources/** — 学习资料与项目交付文档归档
-- **docs/** — 项目文档与开发日志
-- **backups/** — 原始备份归档（K8s 资源快照、工作区备份等）
+[![K3S](https://img.shields.io/badge/K3S-v1.31-blue)](https://k3s.io/)
+[![ArgoCD](https://img.shields.io/badge/ArgoCD-GitOps-ef7b4d)](https://argo-cd.readthedocs.io/)
 
 ---
 
 ## 📁 仓库目录结构
 
 ```
-sre-lab/                                 # ⭐ GitHub 仓库根目录
-│                                        #    git@github.com:fei232401/sre-lab.git
+sre-lab/                                   # ⭐ 仓库根目录
+│                                           #    git@github.com:fei232401/sre-lab.git
 ├── .gitignore
-├── README.md                            # ← 本文件 (仓库总览)
+├── README.md                               # ← 本文件
+├── LICENSE                                 # MIT
 │
-├── sre-lab-gitops/                      # 🚨 ArgoCD 监听目录
-│   ├── manifests/                       #     基线 K8s 清单 (原 01-baseline-manifests)
-│   ├── production/                      # ⚠️ ArgoCD GitOps 生产配置 (原 02-gitops-production)
-│   │   ├── bootstrap/                   #     ArgoCD App of Apps 入口
-│   │   ├── apps/                        #     各应用 K8s 资源清单
-│   │   └── monitoring/                  #     生产监控配置
-│   ├── benchmark/                       #     性能压测 (原 03-benchmark)
-│   ├── k3s-ai-platform/                 #     K3S AI 平台
-│   ├── scripts/                         #     通用运维脚本
-│   │   └── cluster-health-check.sh      #     集群健康检查脚本
-│   ├── grafana/                         #     Grafana 仪表盘配置
+├── 📁 sre-lab-gitops/                      # 🚨 SRE Lab — ArgoCD 工作区
+│   ├── 📁 production/                      # ⚠️ ArgoCD GitOps 生产配置（原 02-gitops-production）
+│   │   ├── 📁 bootstrap/                   #     App of Apps 入口（7个 Application YAML）
+│   │   │   ├── root-app.yaml               #     → 根应用，加载所有子应用
+│   │   │   ├── ai-platform-app.yaml        #     → AI 推理平台
+│   │   │   ├── monitoring-app.yaml         #     → 监控栈（Prometheus/Grafana）
+│   │   │   ├── loki-app.yaml               #     → Loki 日志聚合
+│   │   │   ├── promtail-app.yaml           #     → Promtail 日志采集
+│   │   │   ├── nginx-app.yaml              #     → Nginx 示例
+│   │   │   └── sealed-secrets-app.yaml     #     → Sealed Secrets 加密
+│   │   ├── 📁 apps/                        #     各应用 K8s 清单
+│   │   │   ├── ai-platform/                #     Ollama + Open WebUI
+│   │   │   ├── loki/                       #     Loki 部署
+│   │   │   ├── nginx-demo/                 #     Nginx + Middleware
+│   │   │   ├── promtail/                   #     Promtail DaemonSet
+│   │   │   └── sealed-secrets/             #     Sealed Secrets 控制器
+│   │   └── 📁 monitoring/                  #     监控告警规则
+│   │
+│   ├── 📁 manifests/                       #     基线 K8s 清单（原 01-baseline-manifests）
+│   │   ├── cloud-native-ai/                #     AI 推理平台核心
+│   │   └── monitoring-stack/               #     监控告警体系
+│   │
+│   ├── 📁 benchmark/                       #     性能压测（原 03-benchmark）
+│   │   ├── locustfile.py                   #     Locust 流式压测
+│   │   └── k6-script.js                    #     k6 轻量压测
+│   │
+│   ├── 📁 k3s-ai-platform/                 #     K3S AI 平台项目
+│   │   ├── 📁 docs/                        #     平台文档（架构/部署/运维）
+│   │   ├── 📁 environments/prod/           #     生产环境配置
+│   │   ├── 📁 reference/                   #     参考清单副本
+│   │   ├── 📁 scripts/                     #     运维脚本
+│   │   └── 📁 tools/benchmark/             #     压测工具
+│   │
+│   ├── 📁 scripts/                         #     通用运维脚本
+│   │   └── cluster-health-check.sh         #     集群健康检查
+│   │
+│   ├── 📁 grafana/                         #     Grafana 仪表盘
 │   │   └── dashboard-v2.json
-│   └── cluster-config/                  #     集群配置备份 (kubeconfig 等)
+│   │
+│   └── 📁 cluster-config/                  #     集群配置备份
+│       ├── k3s-full-backup.tar.gz
+│       └── kubeconfig-vm.yaml
 │
-├── ai-model-scheduler/                  # 🆕 AI Model Scheduler 子项目
-│   ├── 01-scheduler-core/               #     调度器核心代码
-│   ├── 02-unified-api/                  #     统一 API 网关
-│   ├── 03-scheduler-benchmark/          #     调度器压力测试
-│   ├── 04-observability/                #     可观测性
-│   ├── docs/                            #     调度器文档
-│   ├── README.md
-│   └── requirements.txt
-│
-├── ai-infra-gateway/                    # 🆕 AI Infra Gateway 子项目
-│   ├── 01-gateway-server/               #     Python 推理网关服务
-│   ├── 02-dashboard/                    #     GPU 实时监控仪表盘
-│   ├── 03-benchmark/                    #     Ollama 本地压测
-│   ├── 04-infrastructure/               #     基础设施与 Prometheus Exporter
-│   ├── 05-autodl-benchmark/             #     AutoDL 云端 vLLM 压测
-│   ├── docs/                            #     网关项目文档
-│   ├── CHANGELOG.md
+├── 📁 ai-model-scheduler/                  # AI Model Scheduler（异构调度层）
+│   ├── 01-scheduler-core/                  #     调度器核心
+│   ├── 02-unified-api/                     #     统一 API 网关
+│   ├── 03-scheduler-benchmark/             #     压测
+│   ├── 04-observability/                   #     可观测性
+│   ├── docs/                               #     文档
 │   └── README.md
 │
-├── resources/                           # 🆕 资料归档
-│   ├── training/                        #     学习培训资料
-│   │   ├── AI Infra 全链路专家教材 v1.docx
-│   │   ├── AI Infra 生产环境实战进阶手册 v1.docx
-│   │   └── ... (更多教程)
-│   └── deliverables/                    #     项目交付文档
-│       ├── AI Infra 项目整合建议.docx
-│       ├── 基础功法.docx
-│       └── 融合功法GLM.docx
+├── 📁 ai-infra-gateway/                    # AI Infra Gateway（Windows 裸金属推理网关）
+│   ├── 01-gateway-server/                  #     FastAPI 推理网关
+│   ├── 02-dashboard/                       #     GPU 实时监控
+│   ├── 03-benchmark/                       #     Ollama 本地压测
+│   ├── 04-infrastructure/                  #     基础设施 + Prometheus Exporter
+│   ├── 05-autodl-benchmark/                #     vLLM 云端压测
+│   ├── docs/                               #     项目文档
+│   └── README.md
 │
-├── docs/                                # 🆕 项目文档与日志
-│   ├── AI_INFRA_DEVELOPMENT_LOG.md      #     开发日志
-│   ├── ARCHITECT_AUDIT.md               #     架构审计
-│   ├── FINAL_REPORT.md                  #     最终报告
-│   ├── PROJECT_NARRATIVE.md             #     项目详细叙事
-│   └── SRE_LAB_ARCHITECT_COMPARISON.md  #     架构对比分析
+├── 📁 resources/                           # 资料归档
+│   ├── 📁 training/                        #     学习培训资料
+│   └── 📁 deliverables/                    #     项目交付文档
 │
-└── backups/                             # 🆕 原始备份归档
-    ├── backup/                          #     K8s 资源备份 (yaml + txt)
-    ├── scheduler-deploy/                #     调度器部署包
-    └── workingspace/                    #     完整工作区快照
+├── 📁 docs/                                # 项目文档与日志
+│   └── AI_INFRA_DEVELOPMENT_LOG.md
+│
+└── 📁 backups/                             # 原始备份归档
+    ├── 📁 backup/                          #     K8s 资源快照
+    ├── 📁 scheduler-deploy/                #     调度器部署包
+    └── 📁 workingspace/                    #     工作区完整副本
 ```
 
 ---
 
-## ⚠️ ArgoCD 工作区说明
+## 🚨 ArgoCD 工作区说明
 
-`sre-lab-gitops/production/` 目录被 **ArgoCD** 监听，**请勿直接修改**。
+**`sre-lab-gitops/production/`** 目录被 ArgoCD 监听，通过同一仓库内的 YAML 自动同步到 K3S 集群。
 
-该目录对应原始仓库中的 `02-gitops-production/`，在重构后被移动到新路径。如果你使用 ArgoCD 管理，需要同步修改 Application 的 `spec.source.path` 配置：
+### ArgoCD Application 路径映射
 
-| 原路径 | 新路径 |
-|--------|--------|
-| `02-gitops-production/bootstrap/` | `sre-lab-gitops/production/bootstrap/` |
-| `02-gitops-production/apps/` | `sre-lab-gitops/production/apps/` |
-| `02-gitops-production/monitoring/` | `sre-lab-gitops/production/monitoring/` |
+| 原始路径 | 新路径 |
+|---------|--------|
+| `02-gitops-production/bootstrap` | `sre-lab-gitops/production/bootstrap` |
+| `02-gitops-production/apps/ai-platform` | `sre-lab-gitops/production/apps/ai-platform` |
+| `02-gitops-production/apps/loki` | `sre-lab-gitops/production/apps/loki` |
+| `02-gitops-production/apps/nginx-demo` | `sre-lab-gitops/production/apps/nginx-demo` |
+| `02-gitops-production/apps/promtail` | `sre-lab-gitops/production/apps/promtail` |
+| `02-gitops-production/apps/sealed-secrets` | `sre-lab-gitops/production/apps/sealed-secrets` |
+| `02-gitops-production/monitoring` | `sre-lab-gitops/production/monitoring` |
 
-需要修改 ArgoCD 中以下 Application 的 path 字段：
-- `root-app`（根应用）
-- `ai-platform-app`
-- `monitoring-app`
-- `loki-app`
-- `promtail-app`
-- `nginx-app`
-- `sealed-secrets-app`
+> 仓库内的所有 bootstrap YAML **已经同步更新为新路径**。如果在 ArgoCD 界面上之前配置过 Application，需要手动更新其 `spec.source.path` 字段。
 
 ---
 
-## 🚀 各项目本地启动
+## 📦 子项目说明
 
-### SRE Lab GitOps（K3S 生产部署）
-
-详见 `sre-lab-gitops/` 各子目录的 README。
-
-### AI Model Scheduler
-
-```bash
-cd ai-model-scheduler
-pip install -r requirements.txt
-python 02-unified-api/unified_gateway.py
-```
-
-### AI Infra Gateway
-
-```bash
-cd ai-infra-gateway
-pip install -r requirements.txt
-python 01-gateway-server/start_gateway.py       # 启动网关 :8000
-python 02-dashboard/dashboard_v2.py             # 启动仪表盘 :9090
-```
+| 项目 | 路径 | 说明 |
+|------|------|------|
+| **SRE Lab GitOps** | `sre-lab-gitops/` | K3S 生产部署全套配置（K8s 清单 + ArgoCD + 压测 + 监控） |
+| **AI Model Scheduler** | `ai-model-scheduler/` | 统一异构调度层，连接 Gateway + SRE-LAB + vLLM |
+| **AI Infra Gateway** | `ai-infra-gateway/` | Windows 裸金属推理网关，FastAPI + Ollama + Prometheus |
 
 ---
 
 ## 🔗 相关链接
 
-- **GitHub 仓库**: `git@github.com:fei232401/sre-lab.git`
-- **SRE Lab 原始 README**: 详见 `sre-lab-gitops/` 子目录
+- **GitHub**: `git@github.com:fei232401/sre-lab.git`
+- **SRE Lab 原始 README**: 详见 `sre-lab-gitops/k3s-ai-platform/README.md`
 - **AI Infra Gateway**: 详见 `ai-infra-gateway/README.md`
 - **AI Model Scheduler**: 详见 `ai-model-scheduler/README.md`
-
----
-
-## 🎓 学习路线（SRE Lab 核心）
-
-| 序号 | 模块 | 核心技术 | 状态 |
-|------|------|---------|------|
-| 01 | 基础设施搭建 | K3S 安装 · kubectl · 节点管理 | ✅ |
-| 02 | AI 推理部署 | Ollama StatefulSet · PVC · 探针 | ✅ |
-| 03 | Traefik 网关 | Ingress · Middleware · StripPrefix | ✅ |
-| 04 | 监控系统 | kube-prometheus-stack · Grafana | ✅ |
-| 05 | 告警通知 | AlertManager · WeChat Bot | ✅ |
-| 06 | 日志系统 (PLG) | Promtail · Loki · Grafana | ✅ |
-| 07 | GitOps | ArgoCD · App of Apps | ✅ |
-| 08 | 密码管理 | Sealed Secrets | ✅ |
-| 09 | 多节点扩展 | K3S Agent · Tailscale 组网 | ✅ |
-| 10 | ExternalService | 集群外服务发现 | ✅ |
-| 11 | 自动扩缩容 | HPA · Scale Behavior | ✅ |
-| 12 | 优雅终止 | PodDisruptionBudget | ✅ |
-| 13 | 压力测试 | Locust / k6 · TTPT/TPOT | ✅ |
 
 ---
 
