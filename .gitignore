@@ -1,24 +1,61 @@
-# 系统文件
-.DS_Store
-Thumbs.db
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.pyc
+
+# Monitoring artifacts
+monitoring/grafana.zip
+monitoring/grafana/
+monitoring/prometheus/
+monitoring/prometheus.zip
 
 # IDE
-.idea/
 .vscode/
+.idea/
 *.swp
 *.swo
 
-# 敏感信息（永远不要提交密钥）
+# OS
+Thumbs.db
+Desktop.ini
+*.lnk
+.DS_Store
+
+# Logs & temp
+*.log
+service_status.txt
+out_models.txt
+diag*.txt
+gateway_log.txt
+gateway_out.txt
+pull_log.txt
+progress_report.txt
+troubleshoot_result.txt
+env_diag_result.txt
+
+# Ollama models (large binary files)
+C:\Users\admin\.ollama/
+
+# GGUF files (downloaded separately)
+*.gguf
+
+# Sensitive info
 *.key
 *.pem
 secrets/
 *-plain.yaml
 secret-plain.yaml
 
-# 压测报告 (本地产物)
+# Large backups (compressed archives only)
+*.tar.gz
+
+# 03-benchmark artifacts (original project)
 03-benchmark/report.html
 03-benchmark/results_*
 03-benchmark/__pycache__/
 03-benchmark/.venv/
-*.pyc
-__pycache__/

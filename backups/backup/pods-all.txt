@@ -1,0 +1,86 @@
+NAMESPACE     NAME                                                     READY   STATUS        RESTARTS        AGE     IP              NODE                      NOMINATED NODE   READINESS GATES
+kube-system   local-path-provisioner-6c86858495-fh8d9                  1/1     Running       5 (4h46m ago)   18d     10.42.0.66      iz2vci3xdp2omstpf3815tz   <none>           <none>
+kube-system   svclb-traefik-c6c0b349-6jlks                             2/2     Running       6 (4h46m ago)   14d     10.42.0.59      iz2vci3xdp2omstpf3815tz   <none>           <none>
+argocd        argocd-redis-9897b6789-frssz                             1/1     Running       2 (4h46m ago)   12d     10.42.0.75      iz2vci3xdp2omstpf3815tz   <none>           <none>
+logging       promtail-wkltf                                           1/1     Running       2 (4h46m ago)   9d      10.42.0.81      iz2vci3xdp2omstpf3815tz   <none>           <none>
+kube-system   helm-delete-traefik-crd-b6ssk                            0/1     Completed     0               14d     <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+kube-system   helm-install-traefik-crd-gwdjg                           0/1     Completed     0               14d     <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+kube-system   helm-install-traefik-fc7dv                               0/1     Completed     1               14d     <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+logging       promtail-flwng                                           1/1     Running       0               4h30m   10.42.1.3       fei                       <none>           <none>
+kube-system   svclb-traefik-c6c0b349-r2wj7                             2/2     Running       0               4h30m   10.42.1.2       fei                       <none>           <none>
+nginx-demo    my-nginx-5d5648d444-gxmdm                                1/1     Running       0               170m    10.42.1.34      fei                       <none>           <none>
+nginx-demo    my-nginx-5d5648d444-gp9bt                                1/1     Running       0               170m    10.42.1.33      fei                       <none>           <none>
+nginx-demo    my-nginx-5d5648d444-h7dv4                                1/1     Running       0               170m    10.42.1.37      fei                       <none>           <none>
+argocd        argocd-applicationset-controller-5f99b65c45-pc82c        1/1     Running       0               170m    10.42.1.35      fei                       <none>           <none>
+argocd        argocd-notifications-controller-5c9975f748-n99vl         1/1     Running       0               170m    10.42.1.40      fei                       <none>           <none>
+argocd        argocd-dex-server-59cbd5f7c9-zxbjj                       1/1     Running       0               170m    10.42.1.32      fei                       <none>           <none>
+kube-system   metrics-server-58c7ddb8c-xsrgw                           1/1     Running       0               170m    10.42.1.41      fei                       <none>           <none>
+ai-platform   ollama-exporter-5df9c959f8-rlmlg                         1/1     Running       0               170m    10.42.1.38      fei                       <none>           <none>
+monitoring    prometheus-stack-prometheus-node-exporter-z4b5z          1/1     Running       0               4h30m   100.113.74.68   fei                       <none>           <none>
+monitoring    alertmanager-prometheus-stack-kube-prom-alertmanager-0   2/2     Running       0               167m    10.42.1.45      fei                       <none>           <none>
+argocd        argocd-application-controller-0                          1/1     Running       0               167m    10.42.1.44      fei                       <none>           <none>
+monitoring    prometheus-stack-grafana-767495c7bc-szjhf                3/3     Running       0               170m    10.42.1.43      fei                       <none>           <none>
+monitoring    prometheus-stack-kube-state-metrics-64479c7d78-9vw7t     1/1     Running       0               170m    10.42.1.36      fei                       <none>           <none>
+monitoring    wechat-adapter-7dc56bf587-5cj58                          1/1     Running       5 (155m ago)    170m    10.42.1.42      fei                       <none>           <none>
+kube-system   coredns-6799fbcd5-kfcjh                                  1/1     Running       6 (4h11m ago)   18d     10.42.0.69      iz2vci3xdp2omstpf3815tz   <none>           <none>
+logging       loki-9dbff7757-7sw6f                                     1/1     Running       1 (4h46m ago)   8d      10.42.0.73      iz2vci3xdp2omstpf3815tz   <none>           <none>
+argocd        argocd-repo-server-649dd74947-8rj69                      1/1     Running       0               170m    10.42.0.91      iz2vci3xdp2omstpf3815tz   <none>           <none>
+kube-system   sealed-secrets-controller-7b6b887fd9-2ndg9               1/1     Running       5 (4h11m ago)   8d      10.42.0.76      iz2vci3xdp2omstpf3815tz   <none>           <none>
+monitoring    prometheus-stack-prometheus-node-exporter-pcm7h          1/1     Running       6 (4h11m ago)   13d     100.88.70.19    iz2vci3xdp2omstpf3815tz   <none>           <none>
+kube-system   traefik-6568597444-cmdtm                                 1/1     Running       5 (4h46m ago)   12d     10.42.0.67      iz2vci3xdp2omstpf3815tz   <none>           <none>
+monitoring    prometheus-stack-kube-prom-operator-54588f6f65-w8mvn     1/1     Running       0               170m    10.42.0.94      iz2vci3xdp2omstpf3815tz   <none>           <none>
+argocd        argocd-server-85b9c74bfb-fx8b8                           1/1     Running       0               163m    10.42.0.98      iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   ollama-0                                                 1/1     Running       3 (4h46m ago)   10d     10.42.0.65      iz2vci3xdp2omstpf3815tz   <none>           <none>
+monitoring    prometheus-prometheus-stack-kube-prom-prometheus-0       2/2     Running       0               3h41m   10.42.0.93      iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-c2gtc                               1/1     Running       0               133m    10.42.0.108     iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-srhg4                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-2zwrj                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-qgflh                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-zbczc                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-qlmc5                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-bfv5k                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-gmshq                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-9clk6                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-dn69w                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-276cp                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-pn972                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-vzrzq                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-d5ddz                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-tzxtq                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-4hl2p                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-5trs9                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-49jbr                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-8x6s2                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-ggnxn                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-cxfhd                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-fk2vr                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-x2hc7                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-hcjl6                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-6q4w8                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-k9nsg                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-9l68f                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-z48p7                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-9hp5j                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-prddp                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-7qhnh                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-2xbgn                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-ng57r                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-jmbxp                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-jc8nw                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-546t4                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-wcdv2                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-nj474                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-m8wgs                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-fd4fd                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-rhvc6                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-8tdnr                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-85wnp                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-hcjh5                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-kjb94                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-zqp22                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-kxh27                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-hv7wt                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-s6p92                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-szk54                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-nxfst                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>
+ai-platform   open-webui-cb786774d-qjdhh                               0/1     OutOfmemory   0               120m    <none>          iz2vci3xdp2omstpf3815tz   <none>           <none>

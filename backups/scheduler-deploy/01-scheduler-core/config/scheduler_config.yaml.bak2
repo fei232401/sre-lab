@@ -1,0 +1,83 @@
+scheduler:
+  port: 9000
+  health_check_interval: 10
+  health_check_timeout: 5
+  backend_unhealthy_threshold: 3
+  backend_recovery_threshold: 2
+  score_window_size: 20
+  circuit_breaker:
+    failure_threshold: 3
+    timeout: 30
+    half_open_max_requests: 2
+  session_ttl: 1800
+
+routing:
+  default_strategy: model_aware
+  strategies:
+    model_aware:
+      enabled: true
+    latency:
+      enabled: true
+    throughput:
+      enabled: true
+    cost:
+      enabled: true
+    affinity:
+      enabled: true
+
+backends:
+  - id: "ollama-k3s"
+    name: "Ollama K3S Cluster"
+    url: "http://100.88.70.19:31434"
+    api_path: "/api/generate"
+    chat_path: "/api/chat"
+    health_path: "/api/tags"
+    models:
+      - "qwen2.5:0.5b"
+      - "nomic-embed-text:latest"
+    engine: "ollama"
+    cost_per_token: 0.0
+    max_concurrency: 8
+    weight: 1.5
+    tags:
+      - "k3s"
+      - "cluster"
+
+  - id: "mock-vllm"
+    name: "Mock vLLM (Simulated)"
+    url: "http://localhost:11436"
+    api_path: "/api/generate"
+    chat_path: "/api/chat"
+    health_path: "/health"
+    models:
+      - "qwen2.5:0.5b"
+    engine: "vllm"
+    cost_per_token: 0.000002
+    max_concurrency: 32
+    weight: 2.0
+    tags:
+      - "cloud"
+      - "mock"
+
+rate_limit:
+  global:
+    enabled: true
+    capacity: 20
+    refill_rate: 10
+  per_backend:
+    enabled: true
+    default_capacity: 20
+    default_refill_rate: 10
+
+auth:
+  enabled: true
+  jwt_secret: "ai-model-scheduler-jwt-secret-key-change-in-production"
+  jwt_algorithm: "HS256"
+  jwt_expiry_minutes: 60
+  api_keys:
+    - "test-key"
+    - "demo-key"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"

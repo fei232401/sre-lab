@@ -1,0 +1,192 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: monitoring-app:networking.k8s.io/Ingress:monitoring/sre-lab-alertmanager-ingress
+      kubernetes.io/ingress.class: traefik
+    creationTimestamp: "2026-06-18T10:40:03Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/name: alertmanager
+      app.kubernetes.io/part-of: monitoring
+    name: sre-lab-alertmanager-ingress
+    namespace: monitoring
+    resourceVersion: "328805"
+    uid: bc1d073a-7fe9-42ce-84a1-29456fd00d50
+  spec:
+    rules:
+    - http:
+        paths:
+        - backend:
+            service:
+              name: prometheus-stack-kube-prom-alertmanager
+              port:
+                number: 9093
+          path: /alertmanager
+          pathType: Prefix
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 100.113.74.68
+      - ip: 100.88.70.19
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: monitoring-app:networking.k8s.io/Ingress:monitoring/sre-lab-grafana-ingress
+      kubernetes.io/ingress.class: traefik
+    creationTimestamp: "2026-06-16T02:40:24Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/part-of: monitoring
+    name: sre-lab-grafana-ingress
+    namespace: monitoring
+    resourceVersion: "328806"
+    uid: 7376396d-1ecc-4f04-b5c4-94244c2dbae6
+  spec:
+    rules:
+    - http:
+        paths:
+        - backend:
+            service:
+              name: prometheus-stack-grafana
+              port:
+                number: 80
+          path: /grafana
+          pathType: Prefix
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 100.113.74.68
+      - ip: 100.88.70.19
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: monitoring-app:networking.k8s.io/Ingress:monitoring/sre-lab-prometheus-ingress
+      kubernetes.io/ingress.class: traefik
+    creationTimestamp: "2026-06-18T10:40:03Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: monitoring
+    name: sre-lab-prometheus-ingress
+    namespace: monitoring
+    resourceVersion: "328807"
+    uid: 9515a97d-ef72-4a41-8338-6114357b5c69
+  spec:
+    rules:
+    - http:
+        paths:
+        - backend:
+            service:
+              name: prometheus-stack-kube-prom-prometheus
+              port:
+                number: 9090
+          path: /prometheus
+          pathType: Prefix
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 100.113.74.68
+      - ip: 100.88.70.19
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: nginx-demo-app:networking.k8s.io/Ingress:nginx-demo/my-nginx-ingress
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"nginx-demo-app:networking.k8s.io/Ingress:nginx-demo/my-nginx-ingress","traefik.ingress.kubernetes.io/router.middlewares":"nginx-demo-strip-nginx-prefix@kubernetescrd"},"labels":{"app.kubernetes.io/part-of":"nginx-demo"},"name":"my-nginx-ingress","namespace":"nginx-demo"},"spec":{"ingressClassName":"traefik","rules":[{"http":{"paths":[{"backend":{"service":{"name":"my-nginx-svc","port":{"number":80}}},"path":"/nginx","pathType":"Prefix"}]}}]}}
+      traefik.ingress.kubernetes.io/router.middlewares: nginx-demo-strip-nginx-prefix@kubernetescrd
+    creationTimestamp: "2026-06-18T09:01:08Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/part-of: nginx-demo
+    name: my-nginx-ingress
+    namespace: nginx-demo
+    resourceVersion: "328808"
+    uid: bbece3bd-149f-4baa-b99f-9ae9ffcf2061
+  spec:
+    ingressClassName: traefik
+    rules:
+    - http:
+        paths:
+        - backend:
+            service:
+              name: my-nginx-svc
+              port:
+                number: 80
+          path: /nginx
+          pathType: Prefix
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 100.113.74.68
+      - ip: 100.88.70.19
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: ai-platform-app:networking.k8s.io/Ingress:ai-platform/sre-lab-ingress
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"ai-platform-app:networking.k8s.io/Ingress:ai-platform/sre-lab-ingress","traefik.ingress.kubernetes.io/router.entrypoints":"web"},"labels":{"app.kubernetes.io/name":"sre-lab-ingress","app.kubernetes.io/part-of":"ai-platform"},"name":"sre-lab-ingress","namespace":"ai-platform"},"spec":{"ingressClassName":"traefik","rules":[{"http":{"paths":[{"backend":{"service":{"name":"open-webui-service","port":{"number":8080}}},"path":"/","pathType":"Prefix"}]}}]}}
+      traefik.ingress.kubernetes.io/router.entrypoints: web
+    creationTimestamp: "2026-06-16T02:40:24Z"
+    generation: 2
+    labels:
+      app.kubernetes.io/name: sre-lab-ingress
+      app.kubernetes.io/part-of: ai-platform
+    name: sre-lab-ingress
+    namespace: ai-platform
+    resourceVersion: "328809"
+    uid: 6c4b7e0b-aadc-45a7-879d-e70efdf1cb35
+  spec:
+    ingressClassName: traefik
+    rules:
+    - http:
+        paths:
+        - backend:
+            service:
+              name: open-webui-service
+              port:
+                number: 8080
+          path: /
+          pathType: Prefix
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 100.113.74.68
+      - ip: 100.88.70.19
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      kubernetes.io/ingress.class: traefik
+    creationTimestamp: "2026-06-16T03:19:07Z"
+    generation: 1
+    name: argocd-server-ingress
+    namespace: argocd
+    resourceVersion: "328810"
+    uid: 2f209a73-bfb7-4087-a25e-a4a78e149094
+  spec:
+    rules:
+    - http:
+        paths:
+        - backend:
+            service:
+              name: argocd-server
+              port:
+                number: 80
+          path: /argocd
+          pathType: Prefix
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 100.113.74.68
+      - ip: 100.88.70.19
+kind: List
+metadata:
+  resourceVersion: ""

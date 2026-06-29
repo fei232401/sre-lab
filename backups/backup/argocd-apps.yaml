@@ -1,0 +1,1682 @@
+apiVersion: v1
+items:
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: root-app:argoproj.io/Application:argocd/loki
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"root-app:argoproj.io/Application:argocd/loki"},"name":"loki","namespace":"argocd"},"spec":{"destination":{"namespace":"logging","server":"https://kubernetes.default.svc"},"project":"default","source":{"path":"02-gitops-production/apps/loki","repoURL":"https://github.com/fei232401/sre-lab.git","targetRevision":"main"},"syncPolicy":{"automated":{"prune":true,"selfHeal":true},"syncOptions":["CreateNamespace=true"]}}}
+    creationTimestamp: "2026-06-18T15:15:32Z"
+    generation: 1069
+    name: loki
+    namespace: argocd
+    resourceVersion: "339275"
+    uid: e9e7c050-c47f-4131-8ebb-654455886ff0
+  spec:
+    destination:
+      namespace: logging
+      server: https://kubernetes.default.svc
+    project: default
+    source:
+      path: 02-gitops-production/apps/loki
+      repoURL: https://github.com/fei232401/sre-lab.git
+      targetRevision: main
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+      - CreateNamespace=true
+  status:
+    controllerNamespace: argocd
+    health:
+      lastTransitionTime: "2026-06-28T12:07:08Z"
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-06-18T15:31:39Z"
+      deployedAt: "2026-06-18T15:31:39Z"
+      id: 0
+      initiatedBy:
+        automated: true
+      revision: 885b05931107e86b06bf40662f805a7b176e7758
+      source:
+        path: 02-gitops-production/apps/loki
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T15:34:51Z"
+      deployedAt: "2026-06-18T15:34:52Z"
+      id: 1
+      initiatedBy:
+        automated: true
+      revision: 807d394254f5554c4da55b58188d55efc68d8ce1
+      source:
+        path: 02-gitops-production/apps/loki
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T15:57:21Z"
+      deployedAt: "2026-06-18T15:57:21Z"
+      id: 2
+      initiatedBy:
+        username: admin
+      revision: 807d394254f5554c4da55b58188d55efc68d8ce1
+      source:
+        path: 02-gitops-production/apps/loki
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T10:21:18Z"
+      deployedAt: "2026-06-19T10:21:19Z"
+      id: 3
+      initiatedBy:
+        automated: true
+      revision: 14ed7a96437ee22e712691eeba7ee50a3fa09fab
+      source:
+        path: 02-gitops-production/apps/loki
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T11:45:39Z"
+      deployedAt: "2026-06-19T11:45:40Z"
+      id: 4
+      initiatedBy:
+        username: admin
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/apps/loki
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T13:48:57Z"
+      deployedAt: "2026-06-19T13:48:58Z"
+      id: 5
+      initiatedBy:
+        username: admin
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/apps/loki
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-06-20T11:45:20Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          automated: true
+        retry:
+          limit: 5
+        sync:
+          autoHealAttemptsCount: 7
+          prune: true
+          resources:
+          - kind: Service
+            name: loki
+          revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+          source:
+            path: 02-gitops-production/apps/loki
+            repoURL: https://github.com/fei232401/sre-lab.git
+            targetRevision: main
+          syncOptions:
+          - CreateNamespace=true
+      phase: Succeeded
+      startedAt: "2026-06-20T11:45:20Z"
+      syncResult:
+        resources:
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/loki configured
+          name: loki
+          namespace: logging
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+        source:
+          path: 02-gitops-production/apps/loki
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+    reconciledAt: "2026-06-28T16:44:46Z"
+    resourceHealthSource: appTree
+    resources:
+    - kind: ConfigMap
+      name: loki-config
+      namespace: logging
+      status: Synced
+      version: v1
+    - kind: Service
+      name: loki
+      namespace: logging
+      status: Synced
+      version: v1
+    - group: apps
+      kind: Deployment
+      name: loki
+      namespace: logging
+      status: Synced
+      version: v1
+    sourceHydrator: {}
+    sourceType: Directory
+    summary:
+      images:
+      - grafana/loki:2.9.2
+    sync:
+      comparedTo:
+        destination:
+          namespace: logging
+          server: https://kubernetes.default.svc
+        source:
+          path: 02-gitops-production/apps/loki
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      status: Synced
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: root-app:argoproj.io/Application:argocd/sealed-secrets
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"root-app:argoproj.io/Application:argocd/sealed-secrets"},"labels":{"app.kubernetes.io/part-of":"sre-lab","sre-lab.component":"security"},"name":"sealed-secrets","namespace":"argocd"},"spec":{"destination":{"namespace":"sealed-secrets","server":"https://kubernetes.default.svc"},"project":"default","source":{"path":"02-gitops-production/apps/sealed-secrets","repoURL":"https://github.com/fei232401/sre-lab.git","targetRevision":"main"},"syncPolicy":{"automated":{"prune":true,"selfHeal":true},"syncOptions":["CreateNamespace=true"]}}}
+    creationTimestamp: "2026-06-20T12:18:02Z"
+    generation: 149
+    labels:
+      app.kubernetes.io/part-of: sre-lab
+      sre-lab.component: security
+    name: sealed-secrets
+    namespace: argocd
+    resourceVersion: "339281"
+    uid: 900a188e-09cc-4ed7-ad3b-5b7f2c43e7ba
+  spec:
+    destination:
+      namespace: sealed-secrets
+      server: https://kubernetes.default.svc
+    project: default
+    source:
+      path: 02-gitops-production/apps/sealed-secrets
+      repoURL: https://github.com/fei232401/sre-lab.git
+      targetRevision: main
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+      - CreateNamespace=true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-28T15:26:55Z"
+      message: 'Failed last sync attempt to [e96165f1afeb3daa3c4043ecd8afdfe2076d22b9]:
+        one or more objects failed to apply, reason: namespaces "sealed-secrets" not
+        found (retried 5 times).'
+      type: SyncError
+    controllerNamespace: argocd
+    health:
+      lastTransitionTime: "2026-06-28T14:36:30Z"
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-06-20T12:18:02Z"
+      deployedAt: "2026-06-20T12:18:03Z"
+      id: 0
+      initiatedBy:
+        automated: true
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      source:
+        path: 02-gitops-production/apps/sealed-secrets
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-06-28T14:41:38Z"
+      message: 'one or more objects failed to apply, reason: namespaces "sealed-secrets"
+        not found (retried 5 times).'
+      operation:
+        initiatedBy:
+          automated: true
+        retry:
+          limit: 5
+        sync:
+          autoHealAttemptsCount: 4
+          prune: true
+          resources:
+          - group: apps
+            kind: Deployment
+            name: sealed-secrets
+          revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+          source:
+            path: 02-gitops-production/apps/sealed-secrets
+            repoURL: https://github.com/fei232401/sre-lab.git
+            targetRevision: main
+          syncOptions:
+          - CreateNamespace=true
+      phase: Failed
+      retryCount: 5
+      startedAt: "2026-06-28T14:36:23Z"
+      syncResult:
+        resources:
+        - group: apps
+          hookPhase: Failed
+          images:
+          - quay.io/bitnami/sealed-secrets-controller:v0.26.3
+          kind: Deployment
+          message: namespaces "sealed-secrets" not found
+          name: sealed-secrets
+          namespace: sealed-secrets
+          status: SyncFailed
+          syncPhase: Sync
+          version: v1
+        revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+        source:
+          path: 02-gitops-production/apps/sealed-secrets
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+    reconciledAt: "2026-06-28T16:44:59Z"
+    resourceHealthSource: appTree
+    resources:
+    - kind: Namespace
+      name: sealed-secrets
+      status: OutOfSync
+      version: v1
+    - kind: Service
+      name: sealed-secrets
+      namespace: sealed-secrets
+      status: OutOfSync
+      version: v1
+    - kind: ServiceAccount
+      name: sealed-secrets
+      namespace: sealed-secrets
+      status: OutOfSync
+      version: v1
+    - group: apps
+      kind: Deployment
+      name: sealed-secrets
+      namespace: sealed-secrets
+      status: OutOfSync
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: sealed-secrets-key-admin
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+      name: sealed-secrets-key-admin-binding
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: Role
+      name: sealed-secrets-service-proxier
+      namespace: kube-system
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
+      name: sealed-secrets-service-proxier-binding
+      namespace: kube-system
+      status: Synced
+      version: v1
+    sourceHydrator: {}
+    sourceType: Directory
+    summary: {}
+    sync:
+      comparedTo:
+        destination:
+          namespace: sealed-secrets
+          server: https://kubernetes.default.svc
+        source:
+          path: 02-gitops-production/apps/sealed-secrets
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      status: OutOfSync
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: root-app:argoproj.io/Application:argocd/ai-platform-app
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"root-app:argoproj.io/Application:argocd/ai-platform-app"},"name":"ai-platform-app","namespace":"argocd"},"spec":{"destination":{"namespace":"ai-platform","server":"https://kubernetes.default.svc"},"project":"default","source":{"path":"02-gitops-production/apps/ai-platform","repoURL":"https://github.com/fei232401/sre-lab.git","targetRevision":"main"},"syncPolicy":{"automated":{"prune":true,"selfHeal":true},"syncOptions":["CreateNamespace=true"]}}}
+    creationTimestamp: "2026-06-18T08:57:38Z"
+    generation: 1277
+    name: ai-platform-app
+    namespace: argocd
+    resourceVersion: "339292"
+    uid: be0f7adf-7282-4112-9bec-5e498089705a
+  spec:
+    destination:
+      namespace: ai-platform
+      server: https://kubernetes.default.svc
+    project: default
+    source:
+      path: 02-gitops-production/apps/ai-platform
+      repoURL: https://github.com/fei232401/sre-lab.git
+      targetRevision: main
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+      - CreateNamespace=true
+  status:
+    controllerNamespace: argocd
+    health:
+      lastTransitionTime: "2026-06-28T14:55:44Z"
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-06-18T10:08:10Z"
+      deployedAt: "2026-06-18T10:08:11Z"
+      id: 0
+      initiatedBy:
+        automated: true
+      revision: 0d4b97bc7e897581b3af56f18034dda739e4dde2
+      source:
+        path: 03-gitops-production/apps/ai-platform
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T11:09:49Z"
+      deployedAt: "2026-06-18T11:09:50Z"
+      id: 1
+      initiatedBy:
+        username: admin
+      revision: 32f212504518550f2526b82fd239c0de5f79a71d
+      source:
+        path: 03-gitops-production/apps/ai-platform
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T12:45:30Z"
+      deployedAt: "2026-06-18T12:45:31Z"
+      id: 2
+      initiatedBy:
+        username: admin
+      revision: 32f212504518550f2526b82fd239c0de5f79a71d
+      source:
+        path: 03-gitops-production/apps/ai-platform
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T13:55:25Z"
+      deployedAt: "2026-06-18T13:55:31Z"
+      id: 3
+      initiatedBy:
+        username: admin
+      revision: a0ee98ab9d544653507f041754a4a3f639fb56bc
+      source:
+        path: 03-gitops-production/apps/ai-platform
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T15:57:17Z"
+      deployedAt: "2026-06-18T15:57:18Z"
+      id: 4
+      initiatedBy:
+        username: admin
+      revision: 807d394254f5554c4da55b58188d55efc68d8ce1
+      source:
+        path: 02-gitops-production/apps/ai-platform
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T11:45:36Z"
+      deployedAt: "2026-06-19T11:45:37Z"
+      id: 5
+      initiatedBy:
+        username: admin
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/apps/ai-platform
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T13:48:57Z"
+      deployedAt: "2026-06-19T13:48:57Z"
+      id: 6
+      initiatedBy:
+        username: admin
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/apps/ai-platform
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-20T12:17:53Z"
+      deployedAt: "2026-06-20T12:17:54Z"
+      id: 7
+      initiatedBy:
+        automated: true
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      source:
+        path: 02-gitops-production/apps/ai-platform
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-06-28T14:57:04Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          automated: true
+        retry:
+          limit: 5
+        sync:
+          autoHealAttemptsCount: 11
+          prune: true
+          resources:
+          - group: apps
+            kind: Deployment
+            name: open-webui
+          revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+          source:
+            path: 02-gitops-production/apps/ai-platform
+            repoURL: https://github.com/fei232401/sre-lab.git
+            targetRevision: main
+          syncOptions:
+          - CreateNamespace=true
+      phase: Succeeded
+      startedAt: "2026-06-28T14:57:03Z"
+      syncResult:
+        resources:
+        - group: apps
+          hookPhase: Running
+          images:
+          - ghcr.io/open-webui/open-webui:main
+          kind: Deployment
+          message: deployment.apps/open-webui configured
+          name: open-webui
+          namespace: ai-platform
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+        source:
+          path: 02-gitops-production/apps/ai-platform
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+    reconciledAt: "2026-06-28T16:45:18Z"
+    resourceHealthSource: appTree
+    resources:
+    - kind: Namespace
+      name: ai-platform
+      status: Synced
+      version: v1
+    - kind: PersistentVolumeClaim
+      name: open-webui-pvc
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - kind: Service
+      name: ollama-headless
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - kind: Service
+      name: ollama-service
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - kind: Service
+      name: open-webui-service
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - group: apps
+      kind: Deployment
+      name: open-webui
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - group: apps
+      kind: StatefulSet
+      name: ollama
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+      name: ollama-hpa
+      namespace: ai-platform
+      status: Synced
+      version: v2
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+      name: open-webui-hpa
+      namespace: ai-platform
+      status: Synced
+      version: v2
+    - group: networking.k8s.io
+      kind: Ingress
+      name: sre-lab-ingress
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - group: policy
+      kind: PodDisruptionBudget
+      name: ollama-pdb
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - group: policy
+      kind: PodDisruptionBudget
+      name: open-webui-pdb
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    sourceHydrator: {}
+    sourceType: Directory
+    summary:
+      externalURLs:
+      - http://100.113.74.68/
+      images:
+      - ghcr.io/open-webui/open-webui:main
+      - ollama/ollama:latest
+    sync:
+      comparedTo:
+        destination:
+          namespace: ai-platform
+          server: https://kubernetes.default.svc
+        source:
+          path: 02-gitops-production/apps/ai-platform
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      status: Synced
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: root-app:argoproj.io/Application:argocd/nginx-demo-app
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"root-app:argoproj.io/Application:argocd/nginx-demo-app"},"name":"nginx-demo-app","namespace":"argocd"},"spec":{"destination":{"namespace":"nginx-demo","server":"https://kubernetes.default.svc"},"project":"default","source":{"path":"02-gitops-production/apps/nginx-demo","repoURL":"https://github.com/fei232401/sre-lab.git","targetRevision":"main"},"syncPolicy":{"automated":{"prune":true,"selfHeal":true},"syncOptions":["CreateNamespace=true"]}}}
+    creationTimestamp: "2026-06-18T08:57:41Z"
+    generation: 1056
+    name: nginx-demo-app
+    namespace: argocd
+    resourceVersion: "339295"
+    uid: b630d032-5843-42e3-8d94-e68214b2a6d3
+  spec:
+    destination:
+      namespace: nginx-demo
+      server: https://kubernetes.default.svc
+    project: default
+    source:
+      path: 02-gitops-production/apps/nginx-demo
+      repoURL: https://github.com/fei232401/sre-lab.git
+      targetRevision: main
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+      - CreateNamespace=true
+  status:
+    controllerNamespace: argocd
+    health:
+      lastTransitionTime: "2026-06-28T13:45:01Z"
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-06-18T09:01:08Z"
+      deployedAt: "2026-06-18T09:01:08Z"
+      id: 0
+      initiatedBy:
+        automated: true
+      revision: 24e4ac0c4bf54111862b37d70f347c8757a89b47
+      source:
+        path: applications/nginx-demo
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T10:00:48Z"
+      deployedAt: "2026-06-18T10:00:48Z"
+      id: 1
+      initiatedBy:
+        username: admin
+      revision: 9c410fcd8ef33e5f9c287a129c60e229e025cea4
+      source:
+        path: 03-gitops-production/apps/nginx-demo
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T10:01:12Z"
+      deployedAt: "2026-06-18T10:01:12Z"
+      id: 2
+      initiatedBy:
+        username: admin
+      revision: 9c410fcd8ef33e5f9c287a129c60e229e025cea4
+      source:
+        path: 03-gitops-production/apps/nginx-demo
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T11:09:55Z"
+      deployedAt: "2026-06-18T11:09:56Z"
+      id: 3
+      initiatedBy:
+        username: admin
+      revision: 32f212504518550f2526b82fd239c0de5f79a71d
+      source:
+        path: 03-gitops-production/apps/nginx-demo
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T12:45:36Z"
+      deployedAt: "2026-06-18T12:45:37Z"
+      id: 4
+      initiatedBy:
+        username: admin
+      revision: 32f212504518550f2526b82fd239c0de5f79a71d
+      source:
+        path: 03-gitops-production/apps/nginx-demo
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T13:55:31Z"
+      deployedAt: "2026-06-18T13:55:32Z"
+      id: 5
+      initiatedBy:
+        username: admin
+      revision: a0ee98ab9d544653507f041754a4a3f639fb56bc
+      source:
+        path: 03-gitops-production/apps/nginx-demo
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T15:57:22Z"
+      deployedAt: "2026-06-18T15:57:23Z"
+      id: 6
+      initiatedBy:
+        username: admin
+      revision: 807d394254f5554c4da55b58188d55efc68d8ce1
+      source:
+        path: 02-gitops-production/apps/nginx-demo
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T13:48:59Z"
+      deployedAt: "2026-06-19T13:48:59Z"
+      id: 7
+      initiatedBy:
+        username: admin
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/apps/nginx-demo
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-28T13:44:53Z"
+      deployedAt: "2026-06-28T13:44:57Z"
+      id: 8
+      initiatedBy:
+        automated: true
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      source:
+        path: 02-gitops-production/apps/nginx-demo
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-06-28T13:44:57Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          automated: true
+        retry:
+          limit: 5
+        sync:
+          prune: true
+          revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+          source:
+            path: 02-gitops-production/apps/nginx-demo
+            repoURL: https://github.com/fei232401/sre-lab.git
+            targetRevision: main
+          syncOptions:
+          - CreateNamespace=true
+      phase: Succeeded
+      startedAt: "2026-06-28T13:44:53Z"
+      syncResult:
+        resources:
+        - group: ""
+          hookPhase: Running
+          kind: Namespace
+          message: namespace/nginx-demo unchanged
+          name: nginx-demo
+          namespace: nginx-demo
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/my-nginx-svc unchanged
+          name: my-nginx-svc
+          namespace: nginx-demo
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          images:
+          - nginx:alpine
+          kind: Deployment
+          message: deployment.apps/my-nginx configured
+          name: my-nginx
+          namespace: nginx-demo
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: networking.k8s.io
+          hookPhase: Running
+          kind: Ingress
+          message: ingress.networking.k8s.io/my-nginx-ingress unchanged
+          name: my-nginx-ingress
+          namespace: nginx-demo
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: traefik.io
+          hookPhase: Running
+          kind: Middleware
+          message: middleware.traefik.io/strip-nginx-prefix unchanged
+          name: strip-nginx-prefix
+          namespace: nginx-demo
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+        source:
+          path: 02-gitops-production/apps/nginx-demo
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+    reconciledAt: "2026-06-28T16:45:20Z"
+    resourceHealthSource: appTree
+    resources:
+    - kind: Namespace
+      name: nginx-demo
+      status: Synced
+      version: v1
+    - kind: Service
+      name: my-nginx-svc
+      namespace: nginx-demo
+      status: Synced
+      version: v1
+    - group: apps
+      kind: Deployment
+      name: my-nginx
+      namespace: nginx-demo
+      status: Synced
+      version: v1
+    - group: networking.k8s.io
+      kind: Ingress
+      name: my-nginx-ingress
+      namespace: nginx-demo
+      status: Synced
+      version: v1
+    - group: traefik.io
+      kind: Middleware
+      name: strip-nginx-prefix
+      namespace: nginx-demo
+      status: Synced
+      version: v1alpha1
+    sourceHydrator: {}
+    sourceType: Directory
+    summary:
+      externalURLs:
+      - http://100.113.74.68/nginx
+      images:
+      - nginx:alpine
+    sync:
+      comparedTo:
+        destination:
+          namespace: nginx-demo
+          server: https://kubernetes.default.svc
+        source:
+          path: 02-gitops-production/apps/nginx-demo
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      status: Synced
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: root-app:argoproj.io/Application:argocd/promtail
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"root-app:argoproj.io/Application:argocd/promtail"},"name":"promtail","namespace":"argocd"},"spec":{"destination":{"namespace":"logging","server":"https://kubernetes.default.svc"},"project":"default","source":{"path":"02-gitops-production/apps/promtail","repoURL":"https://github.com/fei232401/sre-lab.git","targetRevision":"main"},"syncPolicy":{"automated":{"prune":true,"selfHeal":true},"syncOptions":["CreateNamespace=true"]}}}
+    creationTimestamp: "2026-06-18T15:15:32Z"
+    generation: 1046
+    name: promtail
+    namespace: argocd
+    resourceVersion: "339332"
+    uid: 1890f2a1-cc81-4f93-b082-853a52e8aaa3
+  spec:
+    destination:
+      namespace: logging
+      server: https://kubernetes.default.svc
+    project: default
+    source:
+      path: 02-gitops-production/apps/promtail
+      repoURL: https://github.com/fei232401/sre-lab.git
+      targetRevision: main
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+      - CreateNamespace=true
+  status:
+    controllerNamespace: argocd
+    health:
+      lastTransitionTime: "2026-06-28T13:44:54Z"
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-06-18T15:33:05Z"
+      deployedAt: "2026-06-18T15:33:05Z"
+      id: 0
+      initiatedBy:
+        automated: true
+      revision: 885b05931107e86b06bf40662f805a7b176e7758
+      source:
+        path: 02-gitops-production/apps/promtail
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T15:35:32Z"
+      deployedAt: "2026-06-18T15:35:32Z"
+      id: 1
+      initiatedBy:
+        automated: true
+      revision: 807d394254f5554c4da55b58188d55efc68d8ce1
+      source:
+        path: 02-gitops-production/apps/promtail
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T15:57:25Z"
+      deployedAt: "2026-06-18T15:57:26Z"
+      id: 2
+      initiatedBy:
+        username: admin
+      revision: 807d394254f5554c4da55b58188d55efc68d8ce1
+      source:
+        path: 02-gitops-production/apps/promtail
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T10:21:17Z"
+      deployedAt: "2026-06-19T10:21:18Z"
+      id: 3
+      initiatedBy:
+        automated: true
+      revision: 14ed7a96437ee22e712691eeba7ee50a3fa09fab
+      source:
+        path: 02-gitops-production/apps/promtail
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T10:39:26Z"
+      deployedAt: "2026-06-19T10:39:27Z"
+      id: 4
+      initiatedBy:
+        automated: true
+      revision: 504b29a5ab1acc3e7062ae829de510e6dfc97ef6
+      source:
+        path: 02-gitops-production/apps/promtail
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T11:45:22Z"
+      deployedAt: "2026-06-19T11:45:23Z"
+      id: 5
+      initiatedBy:
+        automated: true
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/apps/promtail
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T11:46:13Z"
+      deployedAt: "2026-06-19T11:46:13Z"
+      id: 6
+      initiatedBy:
+        username: admin
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/apps/promtail
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T12:47:44Z"
+      deployedAt: "2026-06-19T12:47:44Z"
+      id: 7
+      initiatedBy:
+        automated: true
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/apps/promtail
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T13:48:59Z"
+      deployedAt: "2026-06-19T13:49:00Z"
+      id: 8
+      initiatedBy:
+        username: admin
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/apps/promtail
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-06-19T13:49:00Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          username: admin
+        retry: {}
+        sync:
+          revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+          source:
+            path: 02-gitops-production/apps/promtail
+            repoURL: https://github.com/fei232401/sre-lab.git
+            targetRevision: main
+          syncOptions:
+          - CreateNamespace=true
+          syncStrategy:
+            hook: {}
+      phase: Succeeded
+      startedAt: "2026-06-19T13:48:59Z"
+      syncResult:
+        resources:
+        - group: ""
+          hookPhase: Running
+          kind: ServiceAccount
+          message: serviceaccount/promtail unchanged
+          name: promtail
+          namespace: logging
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: ConfigMap
+          message: configmap/promtail-config unchanged
+          name: promtail-config
+          namespace: logging
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: rbac.authorization.k8s.io
+          hookPhase: Running
+          kind: ClusterRole
+          message: clusterrole.rbac.authorization.k8s.io/promtail-reader reconciled.
+            clusterrole.rbac.authorization.k8s.io/promtail-reader unchanged
+          name: promtail-reader
+          namespace: logging
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: rbac.authorization.k8s.io
+          hookPhase: Running
+          kind: ClusterRoleBinding
+          message: clusterrolebinding.rbac.authorization.k8s.io/promtail-reader-binding
+            reconciled. clusterrolebinding.rbac.authorization.k8s.io/promtail-reader-binding
+            unchanged
+          name: promtail-reader-binding
+          namespace: logging
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          images:
+          - grafana/promtail:2.9.2
+          kind: DaemonSet
+          message: daemonset.apps/promtail unchanged
+          name: promtail
+          namespace: logging
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+        source:
+          path: 02-gitops-production/apps/promtail
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+    reconciledAt: "2026-06-28T16:46:39Z"
+    resourceHealthSource: appTree
+    resources:
+    - kind: ConfigMap
+      name: promtail-config
+      namespace: logging
+      status: Synced
+      version: v1
+    - kind: ServiceAccount
+      name: promtail
+      namespace: logging
+      status: Synced
+      version: v1
+    - group: apps
+      kind: DaemonSet
+      name: promtail
+      namespace: logging
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: promtail-reader
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+      name: promtail-reader-binding
+      status: Synced
+      version: v1
+    sourceHydrator: {}
+    sourceType: Directory
+    summary:
+      images:
+      - grafana/promtail:2.9.2
+    sync:
+      comparedTo:
+        destination:
+          namespace: logging
+          server: https://kubernetes.default.svc
+        source:
+          path: 02-gitops-production/apps/promtail
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      status: Synced
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: root-app:argoproj.io/Application:argocd/root-app
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"root-app:argoproj.io/Application:argocd/root-app"},"name":"root-app","namespace":"argocd"},"spec":{"destination":{"namespace":"argocd","server":"https://kubernetes.default.svc"},"project":"default","source":{"path":"02-gitops-production/bootstrap","repoURL":"https://github.com/fei232401/sre-lab.git","targetRevision":"main"},"syncPolicy":{"automated":{"prune":true,"selfHeal":true}}}}
+    creationTimestamp: "2026-06-17T13:44:46Z"
+    generation: 1498
+    name: root-app
+    namespace: argocd
+    resourceVersion: "339341"
+    uid: 159c1754-2acb-439c-bb1f-191503591c6d
+  spec:
+    destination:
+      namespace: argocd
+      server: https://kubernetes.default.svc
+    project: default
+    source:
+      path: 02-gitops-production/bootstrap
+      repoURL: https://github.com/fei232401/sre-lab.git
+      targetRevision: main
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+  status:
+    controllerNamespace: argocd
+    health:
+      lastTransitionTime: "2026-06-18T15:33:28Z"
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-06-18T15:57:26Z"
+      deployedAt: "2026-06-18T15:57:27Z"
+      id: 0
+      initiatedBy:
+        username: admin
+      revision: 807d394254f5554c4da55b58188d55efc68d8ce1
+      source:
+        path: 02-gitops-production/bootstrap
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T11:46:58Z"
+      deployedAt: "2026-06-19T11:46:59Z"
+      id: 1
+      initiatedBy:
+        automated: true
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/bootstrap
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T13:49:00Z"
+      deployedAt: "2026-06-19T13:49:01Z"
+      id: 2
+      initiatedBy:
+        username: admin
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/bootstrap
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-20T12:18:00Z"
+      deployedAt: "2026-06-20T12:18:02Z"
+      id: 3
+      initiatedBy:
+        automated: true
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      source:
+        path: 02-gitops-production/bootstrap
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-06-20T12:18:02Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          automated: true
+        retry:
+          limit: 5
+        sync:
+          prune: true
+          revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+          source:
+            path: 02-gitops-production/bootstrap
+            repoURL: https://github.com/fei232401/sre-lab.git
+            targetRevision: main
+      phase: Succeeded
+      startedAt: "2026-06-20T12:18:00Z"
+      syncResult:
+        resources:
+        - group: argoproj.io
+          hookPhase: Running
+          kind: Application
+          message: application.argoproj.io/sealed-secrets created
+          name: sealed-secrets
+          namespace: argocd
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        - group: argoproj.io
+          hookPhase: Running
+          kind: Application
+          message: application.argoproj.io/nginx-demo-app unchanged
+          name: nginx-demo-app
+          namespace: argocd
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        - group: argoproj.io
+          hookPhase: Running
+          kind: Application
+          message: application.argoproj.io/root-app unchanged
+          name: root-app
+          namespace: argocd
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        - group: argoproj.io
+          hookPhase: Running
+          kind: Application
+          message: application.argoproj.io/loki unchanged
+          name: loki
+          namespace: argocd
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        - group: argoproj.io
+          hookPhase: Running
+          kind: Application
+          message: application.argoproj.io/ai-platform-app unchanged
+          name: ai-platform-app
+          namespace: argocd
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        - group: argoproj.io
+          hookPhase: Running
+          kind: Application
+          message: application.argoproj.io/promtail unchanged
+          name: promtail
+          namespace: argocd
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        - group: argoproj.io
+          hookPhase: Running
+          kind: Application
+          message: application.argoproj.io/monitoring-app unchanged
+          name: monitoring-app
+          namespace: argocd
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+        source:
+          path: 02-gitops-production/bootstrap
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+    reconciledAt: "2026-06-28T16:46:53Z"
+    resourceHealthSource: appTree
+    resources:
+    - group: argoproj.io
+      kind: Application
+      name: ai-platform-app
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: loki
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: monitoring-app
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: nginx-demo-app
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: promtail
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: root-app
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: sealed-secrets
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    sourceHydrator: {}
+    sourceType: Directory
+    summary: {}
+    sync:
+      comparedTo:
+        destination:
+          namespace: argocd
+          server: https://kubernetes.default.svc
+        source:
+          path: 02-gitops-production/bootstrap
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      status: Synced
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: root-app:argoproj.io/Application:argocd/monitoring-app
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"root-app:argoproj.io/Application:argocd/monitoring-app"},"labels":{"app.kubernetes.io/part-of":"sre-lab","sre-lab.component":"monitoring"},"name":"monitoring-app","namespace":"argocd"},"spec":{"destination":{"namespace":"monitoring","server":"https://kubernetes.default.svc"},"project":"default","source":{"path":"02-gitops-production/monitoring","repoURL":"https://github.com/fei232401/sre-lab.git","targetRevision":"main"},"syncPolicy":{"automated":{"prune":true,"selfHeal":true},"syncOptions":["CreateNamespace=true","ServerSideApply=true"]}}}
+    creationTimestamp: "2026-06-18T10:39:59Z"
+    generation: 1019
+    labels:
+      app.kubernetes.io/part-of: sre-lab
+      sre-lab.component: monitoring
+    name: monitoring-app
+    namespace: argocd
+    resourceVersion: "339342"
+    uid: 90c00ace-3193-4c0c-98bb-51a3acc430d8
+  spec:
+    destination:
+      namespace: monitoring
+      server: https://kubernetes.default.svc
+    project: default
+    source:
+      path: 02-gitops-production/monitoring
+      repoURL: https://github.com/fei232401/sre-lab.git
+      targetRevision: main
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+  status:
+    controllerNamespace: argocd
+    health:
+      lastTransitionTime: "2026-06-28T14:15:53Z"
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-06-18T10:40:02Z"
+      deployedAt: "2026-06-18T10:40:04Z"
+      id: 0
+      initiatedBy:
+        automated: true
+      revision: f76f69d4c22e79f12b165334f3de41c44cbd1ced
+      source:
+        path: 03-gitops-production/monitoring
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T11:10:33Z"
+      deployedAt: "2026-06-18T11:10:33Z"
+      id: 1
+      initiatedBy:
+        username: admin
+      revision: 32f212504518550f2526b82fd239c0de5f79a71d
+      source:
+        path: 03-gitops-production/monitoring
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T12:45:33Z"
+      deployedAt: "2026-06-18T12:45:34Z"
+      id: 2
+      initiatedBy:
+        username: admin
+      revision: 32f212504518550f2526b82fd239c0de5f79a71d
+      source:
+        path: 03-gitops-production/monitoring
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T13:55:28Z"
+      deployedAt: "2026-06-18T13:55:31Z"
+      id: 3
+      initiatedBy:
+        username: admin
+      revision: a0ee98ab9d544653507f041754a4a3f639fb56bc
+      source:
+        path: 03-gitops-production/monitoring
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T14:31:00Z"
+      deployedAt: "2026-06-18T14:31:01Z"
+      id: 4
+      initiatedBy:
+        automated: true
+      revision: 227ee9b6a2d0dcf1fb04a93b08af59ec9cab3113
+      source:
+        path: 03-gitops-production/monitoring
+        repoURL: git@github.com:fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-18T15:57:21Z"
+      deployedAt: "2026-06-18T15:57:23Z"
+      id: 5
+      initiatedBy:
+        username: admin
+      revision: 807d394254f5554c4da55b58188d55efc68d8ce1
+      source:
+        path: 02-gitops-production/monitoring
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    - deployStartedAt: "2026-06-19T13:48:58Z"
+      deployedAt: "2026-06-19T13:48:59Z"
+      id: 6
+      initiatedBy:
+        username: admin
+      revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+      source:
+        path: 02-gitops-production/monitoring
+        repoURL: https://github.com/fei232401/sre-lab.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-06-19T13:49:00Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          username: admin
+        retry: {}
+        sync:
+          revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+          source:
+            path: 02-gitops-production/monitoring
+            repoURL: https://github.com/fei232401/sre-lab.git
+            targetRevision: main
+          syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+          syncStrategy:
+            hook: {}
+      phase: Succeeded
+      startedAt: "2026-06-19T13:48:58Z"
+      syncResult:
+        resources:
+        - group: ""
+          hookPhase: Running
+          kind: ConfigMap
+          message: configmap/ollama-exporter-script serverside-applied
+          name: ollama-exporter-script
+          namespace: ai-platform
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/wechat-adapter-svc serverside-applied
+          name: wechat-adapter-svc
+          namespace: monitoring
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/ollama-exporter serverside-applied
+          name: ollama-exporter
+          namespace: ai-platform
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          images:
+          - python:3.9-slim
+          kind: Deployment
+          message: deployment.apps/wechat-adapter serverside-applied
+          name: wechat-adapter
+          namespace: monitoring
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          images:
+          - python:3.11-slim
+          kind: Deployment
+          message: deployment.apps/ollama-exporter serverside-applied
+          name: ollama-exporter
+          namespace: ai-platform
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: networking.k8s.io
+          hookPhase: Running
+          kind: Ingress
+          message: ingress.networking.k8s.io/sre-lab-alertmanager-ingress serverside-applied
+          name: sre-lab-alertmanager-ingress
+          namespace: monitoring
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: networking.k8s.io
+          hookPhase: Running
+          kind: Ingress
+          message: ingress.networking.k8s.io/sre-lab-prometheus-ingress serverside-applied
+          name: sre-lab-prometheus-ingress
+          namespace: monitoring
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: networking.k8s.io
+          hookPhase: Running
+          kind: Ingress
+          message: ingress.networking.k8s.io/sre-lab-grafana-ingress serverside-applied
+          name: sre-lab-grafana-ingress
+          namespace: monitoring
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: monitoring.coreos.com
+          hookPhase: Running
+          kind: PrometheusRule
+          message: prometheusrule.monitoring.coreos.com/k3s-alert-overrides serverside-applied
+          name: k3s-alert-overrides
+          namespace: monitoring
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: monitoring.coreos.com
+          hookPhase: Running
+          kind: AlertmanagerConfig
+          message: alertmanagerconfig.monitoring.coreos.com/k3s-controlplane-blackhole
+            serverside-applied
+          name: k3s-controlplane-blackhole
+          namespace: monitoring
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        - group: monitoring.coreos.com
+          hookPhase: Running
+          kind: ServiceMonitor
+          message: servicemonitor.monitoring.coreos.com/nginx-demo-monitor serverside-applied
+          name: nginx-demo-monitor
+          namespace: nginx-demo
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: monitoring.coreos.com
+          hookPhase: Running
+          kind: PrometheusRule
+          message: prometheusrule.monitoring.coreos.com/nginx-demo-rules serverside-applied
+          name: nginx-demo-rules
+          namespace: nginx-demo
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: monitoring.coreos.com
+          hookPhase: Running
+          kind: ServiceMonitor
+          message: servicemonitor.monitoring.coreos.com/ollama-exporter-monitor serverside-applied
+          name: ollama-exporter-monitor
+          namespace: ai-platform
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: monitoring.coreos.com
+          hookPhase: Running
+          kind: PrometheusRule
+          message: prometheusrule.monitoring.coreos.com/ollama-slo-rules serverside-applied
+          name: ollama-slo-rules
+          namespace: ai-platform
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: monitoring.coreos.com
+          hookPhase: Running
+          kind: ServiceMonitor
+          message: servicemonitor.monitoring.coreos.com/prometheus-stack-grafana serverside-applied
+          name: prometheus-stack-grafana
+          namespace: monitoring
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: monitoring.coreos.com
+          hookPhase: Running
+          kind: PrometheusRule
+          message: prometheusrule.monitoring.coreos.com/sre-lab-cluster-alerts serverside-applied
+          name: sre-lab-cluster-alerts
+          namespace: monitoring
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        revision: 2d4904a75b9656d4417e601d3500406ca96c3d44
+        source:
+          path: 02-gitops-production/monitoring
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+    reconciledAt: "2026-06-28T16:46:53Z"
+    resourceHealthSource: appTree
+    resources:
+    - kind: ConfigMap
+      name: ollama-exporter-script
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - kind: Service
+      name: ollama-exporter
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - kind: Service
+      name: wechat-adapter-svc
+      namespace: monitoring
+      status: Synced
+      version: v1
+    - group: apps
+      kind: Deployment
+      name: ollama-exporter
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - group: apps
+      kind: Deployment
+      name: wechat-adapter
+      namespace: monitoring
+      status: Synced
+      version: v1
+    - group: monitoring.coreos.com
+      kind: AlertmanagerConfig
+      name: k3s-controlplane-blackhole
+      namespace: monitoring
+      status: Synced
+      version: v1alpha1
+    - group: monitoring.coreos.com
+      kind: PrometheusRule
+      name: ollama-slo-rules
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - group: monitoring.coreos.com
+      kind: PrometheusRule
+      name: k3s-alert-overrides
+      namespace: monitoring
+      status: Synced
+      version: v1
+    - group: monitoring.coreos.com
+      kind: PrometheusRule
+      name: sre-lab-cluster-alerts
+      namespace: monitoring
+      status: Synced
+      version: v1
+    - group: monitoring.coreos.com
+      kind: PrometheusRule
+      name: nginx-demo-rules
+      namespace: nginx-demo
+      status: Synced
+      version: v1
+    - group: monitoring.coreos.com
+      kind: ServiceMonitor
+      name: ollama-exporter-monitor
+      namespace: ai-platform
+      status: Synced
+      version: v1
+    - group: monitoring.coreos.com
+      kind: ServiceMonitor
+      name: prometheus-stack-grafana
+      namespace: monitoring
+      status: Synced
+      version: v1
+    - group: monitoring.coreos.com
+      kind: ServiceMonitor
+      name: nginx-demo-monitor
+      namespace: nginx-demo
+      status: Synced
+      version: v1
+    - group: networking.k8s.io
+      kind: Ingress
+      name: sre-lab-alertmanager-ingress
+      namespace: monitoring
+      status: Synced
+      version: v1
+    - group: networking.k8s.io
+      kind: Ingress
+      name: sre-lab-grafana-ingress
+      namespace: monitoring
+      status: Synced
+      version: v1
+    - group: networking.k8s.io
+      kind: Ingress
+      name: sre-lab-prometheus-ingress
+      namespace: monitoring
+      status: Synced
+      version: v1
+    sourceHydrator: {}
+    sourceType: Directory
+    summary:
+      externalURLs:
+      - http://100.113.74.68/alertmanager
+      - http://100.113.74.68/grafana
+      - http://100.113.74.68/prometheus
+      images:
+      - python:3.11-slim
+      - python:3.9-slim
+    sync:
+      comparedTo:
+        destination:
+          namespace: monitoring
+          server: https://kubernetes.default.svc
+        source:
+          path: 02-gitops-production/monitoring
+          repoURL: https://github.com/fei232401/sre-lab.git
+          targetRevision: main
+      revision: e96165f1afeb3daa3c4043ecd8afdfe2076d22b9
+      status: Synced
+kind: List
+metadata:
+  resourceVersion: ""

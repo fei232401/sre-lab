@@ -1,0 +1,3 @@
+NAME                      STATUS   ROLES                  AGE     VERSION        INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION       CONTAINER-RUNTIME
+iz2vci3xdp2omstpf3815tz   Ready    control-plane,master   18d     v1.29.3+k3s1   100.88.70.19    <none>        Ubuntu 22.04.5 LTS   5.15.0-179-generic   containerd://1.7.11-k3s2
+fei                       Ready    worker                 4h30m   v1.29.3+k3s1   100.113.74.68   <none>        Ubuntu 24.04.4 LTS   6.8.0-124-generic    containerd://1.7.11-k3s2

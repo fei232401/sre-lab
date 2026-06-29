@@ -1,0 +1,125 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: ai-platform-app:apps/StatefulSet:ai-platform/ollama
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"ai-platform-app:apps/StatefulSet:ai-platform/ollama"},"labels":{"app":"ollama"},"name":"ollama","namespace":"ai-platform"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"ollama"}},"serviceName":"ollama-headless","template":{"metadata":{"labels":{"app":"ollama"}},"spec":{"containers":[{"env":[{"name":"OLLAMA_HOST","value":"0.0.0.0"},{"name":"OLLAMA_ORIGINS","value":"*"}],"image":"ollama/ollama:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/","port":11434},"initialDelaySeconds":0,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":10},"name":"ollama","ports":[{"containerPort":11434,"name":"api"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/api/tags","port":11434},"initialDelaySeconds":0,"periodSeconds":15,"successThreshold":1,"timeoutSeconds":10},"resources":{"limits":{"cpu":"2","memory":"4Gi"},"requests":{"cpu":"500m","memory":"2Gi"}},"startupProbe":{"failureThreshold":30,"httpGet":{"path":"/","port":11434},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5},"volumeMounts":[{"mountPath":"/root/.ollama","name":"ollama-data"}]}]}},"volumeClaimTemplates":[{"metadata":{"name":"ollama-data"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}},"storageClassName":"local-path"}}]}}
+    creationTimestamp: "2026-06-15T14:56:22Z"
+    generation: 8
+    labels:
+      app: ollama
+    name: ollama
+    namespace: ai-platform
+    resourceVersion: "330833"
+    uid: aaee64ff-3039-4200-944e-0cd061937716
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: ollama
+    serviceName: ollama-headless
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ollama
+      spec:
+        containers:
+        - env:
+          - name: OLLAMA_HOST
+            value: 0.0.0.0
+          - name: OLLAMA_ORIGINS
+            value: '*'
+          image: ollama/ollama:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 11434
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: ollama
+          ports:
+          - containerPort: 11434
+            name: api
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/tags
+              port: 11434
+              scheme: HTTP
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 10
+          resources:
+            limits:
+              cpu: "2"
+              memory: 4Gi
+            requests:
+              cpu: 500m
+              memory: 2Gi
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /
+              port: 11434
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /root/.ollama
+            name: ollama-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    updateStrategy:
+      rollingUpdate:
+        partition: 0
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: ollama-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi
+        storageClassName: local-path
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 1
+    collisionCount: 0
+    currentReplicas: 1
+    currentRevision: ollama-f86bcc96d
+    observedGeneration: 8
+    readyReplicas: 1
+    replicas: 1
+    updateRevision: ollama-f86bcc96d
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

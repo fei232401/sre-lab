@@ -1,4 +1,6 @@
-# K3S-AI-PLATFORM
+# K3S-AI-PLATFORM (Archived — Superseded by Parent SRE-LAB)
+
+> ⚠️ **此目录为早期架构迭代存档**。当前生产级配置已迁移至父目录 `sre-lab/` 的 `01-baseline-manifests/` 和 `02-gitops-production/`。
 
 基于K3S的高并发AI推理平台 - 云原生生产级架构
 
