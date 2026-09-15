@@ -1,19 +1,77 @@
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: ollama-headless
+  name: ollama
   namespace: ai-platform
   labels:
     app: ollama
 spec:
-  type: ClusterIP
-  clusterIP: None
+  replicas: 1
   selector:
-    app: ollama
-  ports:
-    - name: api
-      port: 11434
-      targetPort: 11434
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      nodeSelector:
+        node-role: cpu
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: api
+              containerPort: 11434
+              protocol: TCP
+          env:
+            - name: OLLAMA_HOST
+              value: 0.0.0.0
+            - name: OLLAMA_ORIGINS
+              value: "*"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          startupProbe:
+            httpGet:
+              path: /
+              port: 11434
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 11434
+              scheme: HTTP
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /api/tags
+              port: 11434
+              scheme: HTTP
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+      volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: ollama-models
 ---
 apiVersion: v1
 kind: Service
@@ -30,80 +88,4 @@ spec:
     - name: api
       port: 11434
       targetPort: 11434
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: ollama
-  namespace: ai-platform
-  labels:
-    app: ollama
-spec:
-  serviceName: ollama-headless
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ollama
-  template:
-    metadata:
-      labels:
-        app: ollama
-    spec:
-      containers:
-        - name: ollama
-          image: ollama/ollama:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 11434
-              name: api
-          env:
-            - name: OLLAMA_HOST
-              value: "0.0.0.0"
-            - name: OLLAMA_ORIGINS
-              value: "*"
-          resources:
-            requests:
-              cpu: 500m
-              memory: 2Gi
-            limits:
-              cpu: "2"
-              memory: 4Gi
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 11434
-            initialDelaySeconds: 0
-            periodSeconds: 30
-            timeoutSeconds: 10
-            failureThreshold: 3
-            successThreshold: 1
-          readinessProbe:
-            httpGet:
-              path: /api/tags
-              port: 11434
-            initialDelaySeconds: 0
-            periodSeconds: 15
-            timeoutSeconds: 10
-            failureThreshold: 3
-            successThreshold: 1
-          startupProbe:
-            httpGet:
-              path: /
-              port: 11434
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 30
-          volumeMounts:
-            - name: ollama-data
-              mountPath: /root/.ollama
-  volumeClaimTemplates:
-    - metadata:
-        name: ollama-data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        storageClassName: local-path
-        resources:
-          requests:
-            storage: 20Gi
+      protocol: TCP

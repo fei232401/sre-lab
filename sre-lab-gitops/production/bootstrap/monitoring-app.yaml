@@ -1,4 +1,4 @@
-﻿apiVersion: argoproj.io/v1alpha1
+apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: monitoring-app
@@ -9,11 +9,11 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/fei232401/sre-lab.git'
+    repoURL: https://github.com/fei232401/sre-lab.git
     targetRevision: main
     path: sre-lab-gitops/production/monitoring
   destination:
-    server: 'https://kubernetes.default.svc'
+    server: https://kubernetes.default.svc
     namespace: monitoring
   syncPolicy:
     automated:
@@ -22,4 +22,3 @@ spec:
     syncOptions:
     - CreateNamespace=true
     - ServerSideApply=true
-
