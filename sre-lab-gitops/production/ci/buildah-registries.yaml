@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buildah-registries
+  namespace: jenkins
+data:
+  registries.conf: |
+    unqualified-search-registries = ["docker.io"]
+
+    [[registry]]
+    prefix = "docker.io"
+    location = "docker.io"
+
+    [[registry.mirror]]
+    location = "docker.m.daocloud.io"
+
+    [[registry]]
+    prefix = "k3d-sre-registry:5000"
+    location = "k3d-sre-registry:5000"
+    insecure = true

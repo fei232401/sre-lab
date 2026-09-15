@@ -1,0 +1,38 @@
+controller:
+  nodeSelector:
+    node-role: cpu
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1500m
+      memory: 1536Mi
+  serviceType: ClusterIP
+  installPlugins:
+    - kubernetes
+    - workflow-aggregator
+    - git
+    - configuration-as-code
+    - credentials-binding
+  overwritePlugins: false
+  JCasC:
+    defaultConfig: true
+
+persistence:
+  enabled: true
+  storageClass: local-path
+  size: 8Gi
+
+agent:
+  nodeSelector:
+    node-role: cpu
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
+  podRetention: never
+  idleMinutes: 5

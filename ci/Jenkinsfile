@@ -1,0 +1,203 @@
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+apiVersion: v1
+kind: Pod
+spec:
+  nodeSelector:
+    node-role: cpu
+  containers:
+  - name: buildah
+    image: quay.io/buildah/stable:v1.37.0
+    command: ["sleep"]
+    args: ["infinity"]
+    env:
+    - name: CONTAINERS_REGISTRIES_CONF
+      value: /etc/containers/registries.conf
+    - name: BUILDAH_ISOLATION
+      value: chroot
+    - name: STORAGE_DRIVER
+      value: vfs
+    securityContext:
+      runAsUser: 0
+      allowPrivilegeEscalation: true
+    volumeMounts:
+    - name: registries-conf
+      mountPath: /etc/containers/registries.conf
+      subPath: registries.conf
+    - name: containers-storage
+      mountPath: /var/lib/containers
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+  - name: lint
+    image: python:3.11-slim
+    command: ["sleep"]
+    args: ["infinity"]
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+  - name: git
+    image: alpine/git:latest
+    command: ["sleep"]
+    args: ["infinity"]
+    volumeMounts:
+    - name: deploy-key
+      mountPath: /root/.ssh
+      readOnly: true
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+  volumes:
+  - name: registries-conf
+    configMap:
+      name: buildah-registries
+  - name: containers-storage
+    emptyDir: {}
+  - name: deploy-key
+    secret:
+      secretName: jenkins-git-deploy-key
+      defaultMode: 0400
+'''
+    }
+  }
+
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+  }
+
+  environment {
+    REGISTRY   = 'k3d-sre-registry:5000'
+    IMAGE_NAME = 'sre-lab/ollama-exporter'
+    DOCKERFILE = '03-ollama-exporter/Dockerfile'
+    BUILD_CTX  = '03-ollama-exporter'
+    GITOPS_FILE = 'sre-lab-gitops/production/monitoring/ollama-exporter.yaml'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        container('git') {
+          checkout scm
+        }
+      }
+    }
+
+    stage('Resolve Tag') {
+      steps {
+        script {
+          env.SHORT_SHA = sh(script: 'git rev-parse --short=7 HEAD', returnStdout: true).trim()
+          env.IMAGE_REF = "${env.REGISTRY}/${env.IMAGE_NAME}:${env.SHORT_SHA}"
+          echo "镜像将构建为: ${env.IMAGE_REF}"
+        }
+      }
+    }
+
+    stage('Lint') {
+      steps {
+        container('lint') {
+          sh '''
+            python -m py_compile ${BUILD_CTX}/exporter.py
+            echo "exporter.py 语法检查通过"
+          '''
+        }
+      }
+    }
+
+    stage('Build') {
+      steps {
+        container('buildah') {
+          sh '''
+            buildah bud \
+              --storage-driver=vfs \
+              --isolation=chroot \
+              --format=docker \
+              -t ${IMAGE_REF} \
+              -f ${DOCKERFILE} \
+              ${BUILD_CTX}
+            buildah images --storage-driver=vfs | head -5
+          '''
+        }
+      }
+    }
+
+    stage('Push') {
+      steps {
+        container('buildah') {
+          sh '''
+            buildah push \
+              --storage-driver=vfs \
+              --tls-verify=false \
+              ${IMAGE_REF} \
+              docker://${IMAGE_REF}
+          '''
+        }
+      }
+    }
+
+    stage('Verify In Registry') {
+      steps {
+        container('buildah') {
+          sh '''
+            curl -sf "http://${REGISTRY}/v2/${IMAGE_NAME}/tags/list" | tee /tmp/tags.json
+            grep -q "${SHORT_SHA}" /tmp/tags.json
+            echo "镜像已在仓库中登记"
+          '''
+        }
+      }
+    }
+
+    stage('Update GitOps') {
+      steps {
+        container('git') {
+          sh '''
+            set -e
+            git config user.email "jenkins@sre-lab-ci"
+            git config user.name  "Jenkins CI"
+
+            OLD_IMAGE=$(grep -oP "(?<=image: )${REGISTRY}/${IMAGE_NAME}:\\S+" ${GITOPS_FILE} || echo "none")
+            echo "旧镜像: ${OLD_IMAGE}"
+            echo "新镜像: ${IMAGE_REF}"
+
+            sed -i "s|image: ${REGISTRY}/${IMAGE_NAME}:.*|image: ${IMAGE_REF}|" ${GITOPS_FILE}
+
+            if git diff --quiet -- ${GITOPS_FILE}; then
+              echo "镜像 tag 未变化，跳过提交"
+              exit 0
+            fi
+
+            git add ${GITOPS_FILE}
+            git commit -m "ci: bump ollama-exporter to ${SHORT_SHA}"
+            GIT_SSH_COMMAND="ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+              git push git@github.com:fei232401/sre-lab.git HEAD:main
+            echo "GitOps 已写回"
+          '''
+        }
+      }
+    }
+
+  }
+
+  post {
+    success {
+      echo "流水线成功: ${env.IMAGE_REF}"
+    }
+    failure {
+      echo "流水线失败，检查各 stage 日志"
+    }
+  }
+}
