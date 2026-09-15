@@ -27,6 +27,10 @@
 8. **破坏性动作前先留档**:改动任何存量资源前,先 dump 它的当前 YAML
 9. **`k3d-topo-demo` 是当前 kubeconfig 的默认 context**
    —— 所以约束 1 尤其重要,一不小心就操作错集群
+10. **零注释纪律**:所有写进仓库的代码/清单/脚本**一律不写注释、不做自然语言标注**
+    —— 阈值依据、参数来源、设计理由**一律写进文档**(`03_runbook/` / `99_决策日志.md` / `05_学习笔记/`),不写进代码。
+    **本计划正文中的 YAML 代码块写于该规则确立之前,含有解释性注释;落盘到仓库时必须全部剥离**,解释内容移到对应的文档里。
+    理由:重决策轻源码——代码里的注释是第二个真相来源,只会和文档重复甚至冲突
 
 ---
 
@@ -1340,18 +1344,33 @@ git add -A && git commit -m "fix(security): PushPlus token 明文泄露修复(Se
 - 容器资源:CPU throttling / 内存接近 limit
 - 已有规则(节点内存/CPU/磁盘/PVC/CrashLoop)直接保留
 
-- [ ] **Step 2: 在规则里加「来源与依据」注释**
+- [ ] **Step 2: 阈值依据写进文档,不写进 YAML(Global Constraint 10)**
+
+**规则文件本身保持零注释**,阈值依据统一写进 `sre-lab-local/03_runbook/告警规则说明.md`。
+
+规则文件长这样:
 
 ```yaml
-    # 来源: awesome-prometheus-alerts (node-exporter)
-    # 阈值依据: 官方模板用 80%。本机 19GiB 内存 + 监控栈常驻约 8GiB,
-    #           长期占用率本身偏高,所以 warning 定 80%、critical 定 92%
     - alert: NodeHighMemoryUsage
       expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 80
       for: 5m
 ```
 
-**为什么要写注释**:面试官问"你这些阈值哪来的",能答"参考了社区规则库,但根据本机实际基线调过" —— 比答"抄的"强太多。
+依据写在文档里:
+
+```markdown
+# 告警规则说明
+
+## NodeHighMemoryUsage
+- **来源**: awesome-prometheus-alerts(node-exporter 模板)
+- **官方阈值**: 80%
+- **本机调整**: warning 80% / critical 92%
+- **依据**: 本机 19GiB 内存,监控栈常驻约 8GiB,长期占用率本身偏高;
+  用 `node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes` 跑一周基线的实测值定档
+- **面试怎么讲**: "参考了社区规则库,但按本机实测基线调过" —— 不是照抄
+```
+
+**为什么**:面试官问"你这些阈值哪来的",依据在手边就能答;而 YAML 里的注释没人看、还会和文档冲突。
 
 - [ ] **Step 3: 应用并验证规则加载**
 
