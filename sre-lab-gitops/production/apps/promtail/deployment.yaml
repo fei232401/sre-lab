@@ -57,7 +57,7 @@ data:
 
           # __path__: 使用标准 K8s 日志路径格式（不含通配符）
           - replacement: /var/log/pods/*$1/*.log
-            separator: ""
+            separator: "/"
             source_labels:
               - __meta_kubernetes_pod_uid
               - __meta_kubernetes_pod_container_name
