@@ -1,15 +1,14 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: ollama-pdb
+  name: open-webui-pdb
   namespace: ai-platform
   labels:
-    app: ollama
-    app.kubernetes.io/name: ollama
+    app.kubernetes.io/name: open-webui
     app.kubernetes.io/component: high-availability
     app.kubernetes.io/part-of: ai-platform
 spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app: ollama
+      app.kubernetes.io/name: open-webui
