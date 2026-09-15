@@ -106,6 +106,37 @@ ArgoCD 会把 `source.path` 下**所有 YAML 当成 k8s 清单去 apply**。
 | `Namespace` | 用 `CreateNamespace=true`,由 ArgoCD 按需创建但**不纳入生命周期管理** |
 | `CRD`(如 `sealedsecrets.bitnami.com`) | 在清单里加 `argocd.argoproj.io/sync-options: Prune=false` |
 
+### ⚠️ `Synced` 不等于"同步到了远端最新 commit"
+
+**这是最容易骗过自己的一条。** `status.sync.status == Synced` 的含义是:
+
+> "集群状态与 **ArgoCD 当前已知的那个 revision** 一致"
+
+它与"仓库远端 HEAD"**没有任何关系**。ArgoCD 默认约 3 分钟轮询一次 Git,在这期间的窗口里:
+
+- 你 push 了新 commit
+- ArgoCD 仍停在旧 revision 上
+- 它照样报 `Synced` / `Healthy` —— **因为相对那个旧 revision,集群确实是一致的**
+
+**实测踩到**:push 删掉某个对象的 commit 后,ArgoCD 报 `Synced`,但被删的对象**还留在集群里**。一查 revision 才知道它还停在 push 之前那个 commit。
+
+**正确做法:任何"我改了 Git,去验证集群"的动作,先核对 revision。**
+
+```bash
+kubectl --context k3d-ai-cluster -n argocd get application <app> \
+  -o jsonpath='{.status.sync.revision}{"\n"}'
+git rev-parse HEAD
+```
+
+两个值不一致时,不要等轮询,**直接触发 hard refresh**:
+
+```bash
+kubectl --context k3d-ai-cluster -n argocd annotate application <app> \
+  argocd.argoproj.io/refresh=hard --overwrite
+```
+
+> **规律:`Synced` 是一个相对量,不是一个绝对量。** 凡是以"当前状态 == 期望状态"表述的健康信号,都要先问一句"期望状态是谁的期望、是哪个时刻的期望"。
+
 ---
 
 ## 四、`monitoring-app` 的 apply 顺序(⚠️ 有硬约束)
