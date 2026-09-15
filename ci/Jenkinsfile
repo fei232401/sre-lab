@@ -51,8 +51,9 @@ spec:
     command: ["sleep"]
     args: ["infinity"]
     volumeMounts:
-    - name: deploy-key
-      mountPath: /root/.ssh
+    - name: gitea-netrc
+      mountPath: /root/.netrc
+      subPath: netrc
       readOnly: true
     resources:
       requests:
@@ -67,9 +68,9 @@ spec:
       name: buildah-registries
   - name: containers-storage
     emptyDir: {}
-  - name: deploy-key
+  - name: gitea-netrc
     secret:
-      secretName: jenkins-git-deploy-key
+      secretName: gitea-netrc
       defaultMode: 0400
 '''
     }
@@ -86,6 +87,8 @@ spec:
     DOCKERFILE = '03-ollama-exporter/Dockerfile'
     BUILD_CTX  = '03-ollama-exporter'
     GITOPS_FILE = 'sre-lab-gitops/production/monitoring/ollama-exporter.yaml'
+    GIT_REPO    = 'http://gitea:3000/fei232401/sre-lab.git'
+    GIT_TERMINAL_PROMPT = '0'
   }
 
   stages {
@@ -182,9 +185,19 @@ spec:
 
             git add ${GITOPS_FILE}
             git commit -m "ci: bump ollama-exporter to ${SHORT_SHA}"
-            GIT_SSH_COMMAND="ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
-              git push git@github.com:fei232401/sre-lab.git HEAD:main
-            echo "GitOps 已写回"
+
+            for i in 1 2 3; do
+              if git push ${GIT_REPO} HEAD:main; then
+                echo "GitOps 已写回(第 ${i} 次尝试)"
+                exit 0
+              fi
+              echo "推送被拒,拉取远端后重放本地提交(第 ${i} 次)"
+              git fetch ${GIT_REPO} main
+              git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
+              sleep 2
+            done
+            echo "三次写回均失败"
+            exit 1
           '''
         }
       }

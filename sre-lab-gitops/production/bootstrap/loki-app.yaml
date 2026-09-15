@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/fei232401/sre-lab.git
+    repoURL: http://gitea:3000/fei232401/sre-lab.git
     targetRevision: main
     path: sre-lab-gitops/production/apps/loki
   destination:
