@@ -1,0 +1,7 @@
+NAME              STATUS   AGE
+ai-platform       Active   43d
+default           Active   43d
+kube-node-lease   Active   43d
+kube-public       Active   43d
+kube-system       Active   43d
+monitoring        Active   43d

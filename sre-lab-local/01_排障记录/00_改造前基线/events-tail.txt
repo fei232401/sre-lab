@@ -1,0 +1,100 @@
+default       111m        Normal    NodeHasSufficientMemory          node/k3d-ai-cluster-agent-0                                  Node k3d-ai-cluster-agent-0 status is now: NodeHasSufficientMemory
+monitoring    111m        Normal    Started                          pod/monitoring-prometheus-node-exporter-bvxbs                Started container node-exporter
+monitoring    111m        Normal    Created                          pod/monitoring-prometheus-node-exporter-bvxbs                Created container node-exporter
+kube-system   111m        Normal    Started                          pod/metrics-server-5985cbc9d7-n7c8k                          Started container metrics-server
+kube-system   111m        Normal    Created                          pod/metrics-server-5985cbc9d7-n7c8k                          Created container metrics-server
+kube-system   111m        Normal    Pulled                           pod/metrics-server-5985cbc9d7-n7c8k                          Container image "rancher/mirrored-metrics-server:v0.7.2" already present on machine
+ai-platform   111m        Normal    Pulled                           pod/cyberrouter-operator-7f5db5bb78-h4q98                    Container image "cyberrouter-operator:v3" already present on machine
+ai-platform   111m        Normal    Created                          pod/ai-infra-gateway-6df8b89696-zjrsp                        Created container gateway
+ai-platform   111m        Normal    Started                          pod/cyberrouter-operator-7f5db5bb78-h4q98                    Started container manager
+ai-platform   111m        Normal    Pulled                           pod/ollama-675797866d-vrbtx                                  Container image "ollama/ollama:latest" already present on machine
+kube-system   111m        Normal    Created                          pod/svclb-traefik-bb13f5bf-bcsx8                             Created container lb-tcp-80
+kube-system   111m        Normal    Started                          pod/svclb-traefik-bb13f5bf-bcsx8                             Started container lb-tcp-80
+kube-system   111m        Normal    Pulled                           pod/svclb-traefik-bb13f5bf-bcsx8                             Container image "rancher/klipper-lb:v0.4.9" already present on machine
+kube-system   111m        Normal    Created                          pod/svclb-traefik-bb13f5bf-bcsx8                             Created container lb-tcp-443
+kube-system   111m        Normal    Started                          pod/svclb-traefik-bb13f5bf-bcsx8                             Started container lb-tcp-443
+monitoring    111m        Normal    Pulled                           pod/alertmanager-monitoring-kube-prometheus-alertmanager-0   Container image "quay.io/prometheus-operator/prometheus-config-reloader:v0.92.1" already present on machine
+default       111m        Normal    NodeAllocatableEnforced          node/k3d-ai-cluster-agent-0                                  Updated Node Allocatable limit across pods
+default       111m        Warning   InvalidDiskCapacity              node/k3d-ai-cluster-agent-0                                  invalid capacity 0 on image filesystem
+default       111m        Normal    Starting                         node/k3d-ai-cluster-agent-0                                  Starting kubelet.
+monitoring    111m        Normal    Started                          pod/monitoring-grafana-67657cff47-6g7s9                      Started container grafana
+monitoring    111m        Normal    Created                          pod/alertmanager-monitoring-kube-prometheus-alertmanager-0   Created container init-config-reloader
+monitoring    111m        Normal    Pulled                           pod/monitoring-grafana-67657cff47-6g7s9                      Container image "docker.io/grafana/grafana:13.1.1" already present on machine
+ai-platform   111m        Normal    Started                          pod/ai-infra-gateway-6df8b89696-zjrsp                        Started container gateway
+monitoring    111m        Normal    Started                          pod/monitoring-grafana-67657cff47-6g7s9                      Started container grafana-sc-datasources
+monitoring    111m        Normal    Created                          pod/monitoring-grafana-67657cff47-6g7s9                      Created container grafana-sc-datasources
+monitoring    111m        Normal    Pulled                           pod/monitoring-grafana-67657cff47-6g7s9                      Container image "quay.io/kiwigrid/k8s-sidecar:2.8.1" already present on machine
+ai-platform   111m        Normal    Created                          pod/ollama-675797866d-vrbtx                                  Created container ollama
+ai-platform   111m        Normal    Started                          pod/ollama-675797866d-vrbtx                                  Started container ollama
+monitoring    111m        Normal    Started                          pod/alertmanager-monitoring-kube-prometheus-alertmanager-0   Started container init-config-reloader
+monitoring    111m        Normal    Started                          pod/monitoring-grafana-67657cff47-6g7s9                      Started container grafana-sc-dashboard
+monitoring    111m        Normal    Created                          pod/monitoring-grafana-67657cff47-6g7s9                      Created container grafana-sc-dashboard
+monitoring    111m        Normal    Pulled                           pod/monitoring-grafana-67657cff47-6g7s9                      Container image "quay.io/kiwigrid/k8s-sidecar:2.8.1" already present on machine
+monitoring    111m        Normal    Pulled                           pod/alertmanager-monitoring-kube-prometheus-alertmanager-0   Container image "quay.io/prometheus/alertmanager:v0.33.1" already present on machine
+ai-platform   111m        Normal    Pulled                           pod/ai-infra-gateway-6df8b89696-zjrsp                        Container image "ai-infra-gateway:v20" already present on machine
+kube-system   111m        Normal    Started                          pod/coredns-ccb96694c-qjxgg                                  Started container coredns
+kube-system   111m        Normal    Created                          pod/coredns-ccb96694c-qjxgg                                  Created container coredns
+kube-system   111m        Normal    Pulled                           pod/coredns-ccb96694c-qjxgg                                  Container image "rancher/mirrored-coredns-coredns:1.12.0" already present on machine
+monitoring    111m        Normal    Created                          pod/alertmanager-monitoring-kube-prometheus-alertmanager-0   Created container alertmanager
+monitoring    111m        Normal    Started                          pod/alertmanager-monitoring-kube-prometheus-alertmanager-0   Started container alertmanager
+monitoring    111m        Normal    Pulled                           pod/alertmanager-monitoring-kube-prometheus-alertmanager-0   Container image "quay.io/prometheus-operator/prometheus-config-reloader:v0.92.1" already present on machine
+ai-platform   111m        Warning   UnexpectedAdmissionError         pod/vllm-3b-7c59d66664-t4jlb                                 Allocate failed due to no healthy devices present; cannot allocate unhealthy devices nvidia.com/gpu, which is unexpected
+monitoring    111m        Normal    Created                          pod/alertmanager-monitoring-kube-prometheus-alertmanager-0   Created container config-reloader
+monitoring    111m        Normal    Started                          pod/alertmanager-monitoring-kube-prometheus-alertmanager-0   Started container config-reloader
+kube-system   111m        Warning   Unhealthy                        pod/coredns-ccb96694c-qjxgg                                  Readiness probe failed: HTTP probe failed with statuscode: 503
+kube-system   111m        Normal    SandboxChanged                   pod/svclb-traefik-bb13f5bf-fxpzv                             Pod sandbox changed, it will be killed and re-created.
+kube-system   111m        Normal    Started                          pod/local-path-provisioner-5cf85fd84d-j4wpw                  Started container local-path-provisioner
+monitoring    111m        Normal    SandboxChanged                   pod/monitoring-kube-state-metrics-8648f77bfb-hnkrm           Pod sandbox changed, it will be killed and re-created.
+monitoring    111m        Normal    Started                          pod/prometheus-monitoring-kube-prometheus-prometheus-0       Started container init-config-reloader
+monitoring    111m        Normal    Created                          pod/prometheus-monitoring-kube-prometheus-prometheus-0       Created container init-config-reloader
+ai-platform   111m        Warning   FailedMount                      pod/vllm-3b-7c59d66664-t4jlb                                 MountVolume.SetUp failed for volume "kube-api-access-clsng" : object "ai-platform"/"kube-root-ca.crt" not registered
+ai-platform   111m        Warning   FailedMount                      pod/vllm-3b-7c59d66664-t4jlb                                 MountVolume.SetUp failed for volume "lmcache-config" : object "ai-platform"/"lmcache-config" not registered
+monitoring    111m        Normal    Pulled                           pod/prometheus-monitoring-kube-prometheus-prometheus-0       Container image "quay.io/prometheus-operator/prometheus-config-reloader:v0.92.1" already present on machine
+kube-system   111m        Normal    Started                          pod/traefik-5d45fc8cc9-h47hx                                 Started container traefik
+monitoring    111m        Normal    SandboxChanged                   pod/gpu-exporter-8h8qx                                       Pod sandbox changed, it will be killed and re-created.
+monitoring    111m        Normal    Pulled                           pod/gpu-exporter-8h8qx                                       Container image "nvidia-smi-exporter:latest" already present on machine
+monitoring    111m        Normal    Created                          pod/gpu-exporter-8h8qx                                       Created container exporter
+monitoring    111m        Normal    Started                          pod/gpu-exporter-8h8qx                                       Started container exporter
+monitoring    111m        Normal    SandboxChanged                   pod/prometheus-monitoring-kube-prometheus-prometheus-0       Pod sandbox changed, it will be killed and re-created.
+kube-system   111m        Normal    Created                          pod/traefik-5d45fc8cc9-h47hx                                 Created container traefik
+kube-system   111m        Normal    Pulled                           pod/traefik-5d45fc8cc9-h47hx                                 Container image "rancher/mirrored-library-traefik:2.11.18" already present on machine
+kube-system   111m        Normal    SandboxChanged                   pod/traefik-5d45fc8cc9-h47hx                                 Pod sandbox changed, it will be killed and re-created.
+kube-system   111m        Normal    SandboxChanged                   pod/local-path-provisioner-5cf85fd84d-j4wpw                  Pod sandbox changed, it will be killed and re-created.
+kube-system   111m        Normal    Pulled                           pod/local-path-provisioner-5cf85fd84d-j4wpw                  Container image "rancher/local-path-provisioner:v0.0.30" already present on machine
+kube-system   111m        Normal    Created                          pod/local-path-provisioner-5cf85fd84d-j4wpw                  Created container local-path-provisioner
+kube-system   111m        Normal    Started                          pod/svclb-traefik-bb13f5bf-fxpzv                             Started container lb-tcp-443
+kube-system   111m        Normal    Created                          pod/svclb-traefik-bb13f5bf-fxpzv                             Created container lb-tcp-443
+kube-system   111m        Normal    Pulled                           pod/svclb-traefik-bb13f5bf-fxpzv                             Container image "rancher/klipper-lb:v0.4.9" already present on machine
+monitoring    111m        Normal    SandboxChanged                   pod/monitoring-kube-prometheus-operator-597f878c98-wwdrb     Pod sandbox changed, it will be killed and re-created.
+monitoring    111m        Normal    Pulled                           pod/monitoring-kube-prometheus-operator-597f878c98-wwdrb     Container image "quay.io/prometheus-operator/prometheus-operator:v0.92.1" already present on machine
+monitoring    111m        Normal    Created                          pod/monitoring-kube-prometheus-operator-597f878c98-wwdrb     Created container kube-prometheus-stack
+monitoring    111m        Normal    Started                          pod/monitoring-kube-prometheus-operator-597f878c98-wwdrb     Started container kube-prometheus-stack
+monitoring    111m        Normal    Started                          pod/monitoring-prometheus-node-exporter-tlc9h                Started container node-exporter
+kube-system   111m        Normal    Started                          pod/svclb-traefik-bb13f5bf-fxpzv                             Started container lb-tcp-80
+monitoring    111m        Normal    Created                          pod/monitoring-prometheus-node-exporter-tlc9h                Created container node-exporter
+monitoring    111m        Normal    Pulled                           pod/monitoring-prometheus-node-exporter-tlc9h                Container image "quay.io/prometheus/node-exporter:v1.12.1-distroless" already present on machine
+monitoring    111m        Normal    SandboxChanged                   pod/monitoring-prometheus-node-exporter-tlc9h                Pod sandbox changed, it will be killed and re-created.
+kube-system   111m        Normal    SandboxChanged                   pod/nvidia-device-plugin-daemonset-q8gkz                     Pod sandbox changed, it will be killed and re-created.
+kube-system   111m        Normal    Pulled                           pod/nvidia-device-plugin-daemonset-q8gkz                     Container image "nvcr.io/nvidia/k8s-device-plugin:v0.17.0" already present on machine
+kube-system   111m        Normal    Created                          pod/svclb-traefik-bb13f5bf-fxpzv                             Created container lb-tcp-80
+kube-system   111m        Normal    Pulled                           pod/svclb-traefik-bb13f5bf-fxpzv                             Container image "rancher/klipper-lb:v0.4.9" already present on machine
+kube-system   111m        Normal    Created                          pod/nvidia-device-plugin-daemonset-q8gkz                     Created container nvidia-device-plugin-ctr
+kube-system   111m        Normal    Started                          pod/nvidia-device-plugin-daemonset-q8gkz                     Started container nvidia-device-plugin-ctr
+monitoring    111m        Normal    Started                          pod/prometheus-monitoring-kube-prometheus-prometheus-0       Started container config-reloader
+monitoring    111m        Normal    Created                          pod/prometheus-monitoring-kube-prometheus-prometheus-0       Created container config-reloader
+monitoring    111m        Normal    Pulled                           pod/prometheus-monitoring-kube-prometheus-prometheus-0       Container image "quay.io/prometheus-operator/prometheus-config-reloader:v0.92.1" already present on machine
+monitoring    111m        Normal    Started                          pod/prometheus-monitoring-kube-prometheus-prometheus-0       Started container prometheus
+monitoring    111m        Normal    Created                          pod/prometheus-monitoring-kube-prometheus-prometheus-0       Created container prometheus
+monitoring    111m        Normal    Pulled                           pod/prometheus-monitoring-kube-prometheus-prometheus-0       Container image "quay.io/prometheus/prometheus:v3.13.1-distroless" already present on machine
+kube-system   111m        Normal    UpdatedLoadBalancer              service/traefik                                              Updated LoadBalancer with new IPs: [172.18.0.4 172.18.0.5] -> [172.18.0.4 172.18.0.5]
+monitoring    111m        Warning   BackOff                          pod/monitoring-kube-state-metrics-8648f77bfb-hnkrm           Back-off restarting failed container kube-state-metrics in pod monitoring-kube-state-metrics-8648f77bfb-hnkrm_monitoring(b182b85a-51d6-4b1f-8d60-fd90950ab37f)
+ai-platform   111m        Normal    SuccessfulCreate                 replicaset/vllm-3b-7c59d66664                                Created pod: vllm-3b-7c59d66664-t86mv
+ai-platform   111m        Normal    Pulled                           pod/vllm-3b-7c59d66664-t86mv                                 Container image "vllm/vllm-openai:latest" already present on machine
+ai-platform   111m        Normal    Started                          pod/vllm-3b-7c59d66664-t86mv                                 Started container vllm
+ai-platform   111m        Normal    Created                          pod/vllm-3b-7c59d66664-t86mv                                 Created container vllm
+kube-system   111m        Warning   Unhealthy                        pod/metrics-server-5985cbc9d7-n7c8k                          Readiness probe failed: HTTP probe failed with statuscode: 500
+monitoring    111m        Normal    Pulled                           pod/monitoring-kube-state-metrics-8648f77bfb-hnkrm           Container image "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.19.1" already present on machine
+monitoring    111m        Normal    Created                          pod/monitoring-kube-state-metrics-8648f77bfb-hnkrm           Created container kube-state-metrics
+monitoring    111m        Normal    Started                          pod/monitoring-kube-state-metrics-8648f77bfb-hnkrm           Started container kube-state-metrics
+kube-system   110m        Normal    UpdatedLoadBalancer              service/traefik                                              Updated LoadBalancer with new IPs: [172.18.0.4 172.18.0.5] -> [172.18.0.3 172.18.0.4 172.18.0.5]
+kube-system   110m        Normal    UpdatedLoadBalancer              service/traefik                                              Updated LoadBalancer with new IPs: [172.18.0.3 172.18.0.4 172.18.0.5] -> [172.18.0.3 172.18.0.4 172.18.0.5]

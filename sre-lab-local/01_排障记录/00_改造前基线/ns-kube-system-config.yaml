@@ -1,0 +1,222 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/4ySX4vUMBTFv4rc52TsnyntBHxaHwQRQcQX8eE2PZnGpklJMiOy9LtL6+AuLqv7mD/3d889594TL/YLYrLBk6JrSYIm6wdSdBe8secPvJCgGZkHzkzqntj7kDnb4NN2DP136JyQD9GGg+acHQ42vLYbY4SbpQ4+x+AcotQjxywjzjbluDNIPEsIPzyiPF+nG+jR07UUr95bP7x5BzffbdD/cjzPIEU5MoydXvQ9Lay3munSQ6afKWOmVZCO2KV/tjNS5nkh5S/OCXLcw/3TlJHTSIp0YU4tuOWqQT1At+WpaXXLdXUsue5MjcYwGrN1u+n+7dxmJXyWD1M8p1PQPscnGER4jUTq619hP/GUBPUu6OnjVvkWDntAyrBLEPQQ45+r26Y8DuGJzZd9EUzfFmV/amVXAPJYdL3sOj5KU6Epi0E3ha5o/bauvwIAAP//iW87OJECAAA
+      objectset.rio.cattle.io/id: helm-controller-chart-registration
+      objectset.rio.cattle.io/owner-gvk: helm.cattle.io/v1, Kind=HelmChart
+      objectset.rio.cattle.io/owner-name: traefik
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2026-08-03T15:03:28Z"
+    labels:
+      objectset.rio.cattle.io/hash: c0f97ea7a25e3dec71957c7a3241a38f3e5fae5f
+    name: chart-content-traefik
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: helm.cattle.io/v1
+      blockOwnerDeletion: false
+      controller: false
+      kind: HelmChart
+      name: traefik
+      uid: fb701b97-80ee-408b-88a4-f2e510dc50c2
+    resourceVersion: "397"
+    uid: b12da513-cbbc-464a-aa90-52ac37d97725
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/4yST6sTMRTFv4rcdVLnL+kEXNWFICKIuBEXN5mbTpxMMiRpRcp8d5mxaPW9vveWSTi/nHvOvQDO9gvFZIMHCecSGIzW9yDhELyxxw84A4OJMvaYEeQF0PuQMdvg03oM6jvpnCjvog07jTk72tnw2q6MgdzEdfA5Bucocj1gzDzS0aYcNwawu4Tww1Pkx/N4Bd08nUv26r31/Zt35KbDCn2W43EikJAjkrEj17F/kSTNqFfdeFLE08+UaYKFgY602f9sJ0oZpxmkPznHwKEi92QwA6YBJDR7Y+q+1XVZClWLyuheY1t0omtNZypRVGiKtqvW367ef6e3xkk+838nueeVwTbLJzIUyWtKIL/+V/qDbIGBckGPH1flW3K0FSUNukQM/tb55+q6MbdlPBr3aVuKptJFqxrDe9UJ3oh9x5UhwYum6IpGC421gOXbsvwKAAD///iS41qdAgAA
+      objectset.rio.cattle.io/id: helm-controller-chart-registration
+      objectset.rio.cattle.io/owner-gvk: helm.cattle.io/v1, Kind=HelmChart
+      objectset.rio.cattle.io/owner-name: traefik-crd
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2026-08-03T15:03:28Z"
+    labels:
+      objectset.rio.cattle.io/hash: 48ff3d5c3117b372fcdca509795f9f2702af0592
+    name: chart-content-traefik-crd
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: helm.cattle.io/v1
+      blockOwnerDeletion: false
+      controller: false
+      kind: HelmChart
+      name: traefik-crd
+      uid: 42c05b4f-db97-4789-bfe7-040904c7ca37
+    resourceVersion: "398"
+    uid: 8c8eaaf1-4b2c-4c90-a3d7-a6d888541596
+- apiVersion: v1
+  data:
+    clusterDNS: 10.43.0.10
+    clusterDomain: cluster.local
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-08-03T15:03:26Z"
+    name: cluster-dns
+    namespace: kube-system
+    resourceVersion: "233"
+    uid: a8b28331-cc9a-408a-bd30-a76b03331063
+- apiVersion: v1
+  data:
+    Corefile: |
+      .:53 {
+          errors
+          health
+          ready
+          kubernetes cluster.local in-addr.arpa ip6.arpa {
+            pods insecure
+            fallthrough in-addr.arpa ip6.arpa
+          }
+          hosts /etc/coredns/NodeHosts {
+            ttl 60
+            reload 15s
+            fallthrough
+          }
+          prometheus :9153
+          forward . /etc/resolv.conf
+          cache 30
+          loop
+          reload
+          loadbalance
+          import /etc/coredns/custom/*.override
+      }
+      import /etc/coredns/custom/*.server
+    NodeHosts: |
+      172.18.0.3 k3d-ai-cluster-agent-1
+      172.18.0.4 k3d-ai-cluster-agent-0
+      172.18.0.5 k3d-ai-cluster-server-0
+  kind: ConfigMap
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/4yQwWrzMBCEX0Xs2fEf20nsX9BDybH02lMva2kdq1Z2g6SkBJN3L8IUCiVtbyNGOzvfzoAn90IhOmHQcKmgAIsJQc+wl0CD8wQaSr1t1PzKSilFIUiIix4JfRoXHQjtdZHTuafAlCgq488xUSi9wK2AybEFDXvhwR2e8QQFHCnh50ZkloTJCcf8lP6NTIqUyuCkNJiSp9LJP5czoLjryztTWB0uE2iYmvjFuVSFenJsHx6tFf41gvGY6Y0Eshz/9D2e0OSZfIJVvMZExwzusSf/I9SIcQQNvaG6a+r/XVdV7abBddPtsN9W66Eedi0N7aberM22zaHf6t0tcPsIAAD//8Ix+PfoAQAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+      objectset.rio.cattle.io/owner-name: coredns
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2026-08-03T15:03:28Z"
+    labels:
+      objectset.rio.cattle.io/hash: bce283298811743a0386ab510f2f67ef74240c57
+    name: coredns
+    namespace: kube-system
+    resourceVersion: "173890"
+    uid: 418f75ee-640d-4cf7-8ff0-ea8c8b677d4b
+- apiVersion: v1
+  data:
+    client-ca-file: |
+      -----BEGIN CERTIFICATE-----
+      MIIBeDCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3MtY2xp
+      ZW50LWNhQDE3ODU3Njk0MDAwHhcNMjYwODAzMTUwMzIwWhcNMzYwNzMxMTUwMzIw
+      WjAjMSEwHwYDVQQDDBhrM3MtY2xpZW50LWNhQDE3ODU3Njk0MDAwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAR83VnJk8kn0piHN+VBYOj/OT3CaaljhsORECvbLLJm
+      8lYDOug1CQTbnveTlEHZ0Sm+Gp9zw57DXpEMSqyXWNbOo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUoSWzMTrwF75+zhGt0nFq
+      RCHiDN4wCgYIKoZIzj0EAwIDSQAwRgIhANQXOpyq89ppR6tv+QDxqxowqeGTlEjA
+      fxatzoThHpD9AiEAqIvbjl3Lv0iL8J6Bzv9rC1P9Fz8rxFz/8zobo8AgRUI=
+      -----END CERTIFICATE-----
+    requestheader-allowed-names: '["system:auth-proxy"]'
+    requestheader-client-ca-file: |
+      -----BEGIN CERTIFICATE-----
+      MIIBiDCCAS2gAwIBAgIBADAKBggqhkjOPQQDAjArMSkwJwYDVQQDDCBrM3MtcmVx
+      dWVzdC1oZWFkZXItY2FAMTc4NTc2OTQwMDAeFw0yNjA4MDMxNTAzMjBaFw0zNjA3
+      MzExNTAzMjBaMCsxKTAnBgNVBAMMIGszcy1yZXF1ZXN0LWhlYWRlci1jYUAxNzg1
+      NzY5NDAwMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEDRSAgjP9ly9zLW8ueZMI
+      BBflhkIEcW26tW6TJSH4VQ7bxvpqigCKiltF6aDezZnpXDgjAEI3QLQmT3eOkHrS
+      Q6NCMEAwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYE
+      FOkem7X+SkX63a69ZFb8SUaKhZQXMAoGCCqGSM49BAMCA0kAMEYCIQC8ESAFQ7S1
+      uWLRvKscghlNfI4ENbQaT7EAi6k9OuJkfgIhAP9me+2FeqCMOCI2k+vH5HHeckZM
+      yqchZn7Ficn60Ifm
+      -----END CERTIFICATE-----
+    requestheader-extra-headers-prefix: '["X-Remote-Extra-"]'
+    requestheader-group-headers: '["X-Remote-Group"]'
+    requestheader-username-headers: '["X-Remote-User"]'
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-08-03T15:03:21Z"
+    name: extension-apiserver-authentication
+    namespace: kube-system
+    resourceVersion: "33"
+    uid: caba5761-77cd-4ce0-8c50-763ed0fef475
+- apiVersion: v1
+  data:
+    since: "2026-08-03"
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-08-03T15:03:21Z"
+    name: kube-apiserver-legacy-service-account-token-tracking
+    namespace: kube-system
+    resourceVersion: "63"
+    uid: f592993b-4d7f-40ae-9800-13c512f81b13
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3ODU3Njk0MDAwHhcNMjYwODAzMTUwMzIwWhcNMzYwNzMxMTUwMzIw
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3ODU3Njk0MDAwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAQ9iQ03Ff0aA11/GR+qZPZSx3MX+eshgpQuYMDwAFw4
+      h1dfD8gKxkwBFB5dWCP+59sUPFl7W90ejFs/9xBFCt7Xo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUT/8YCP2roDIfKQikrBpt
+      vK3M+iQwCgYIKoZIzj0EAwIDRwAwRAIgUhzon/m503YyYCeSEbaKc10gufCrIrb5
+      nSiuYr4q2P0CIGu1bEF8wVV9ndqDr6tlnZGMMKRADNydlVD2Z88MQ4Ai
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-08-03T15:03:31Z"
+    name: kube-root-ca.crt
+    namespace: kube-system
+    resourceVersion: "490"
+    uid: cc60ba47-cc4d-449f-a8ed-838e6e52e5cf
+- apiVersion: v1
+  data:
+    config.json: |-
+      {
+        "nodePathMap":[
+        {
+          "node":"DEFAULT_PATH_FOR_NON_LISTED_NODES",
+          "paths":["/var/lib/rancher/k3s/storage"]
+        }
+        ]
+      }
+    helperPod.yaml: |-
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: helper-pod
+      spec:
+        containers:
+        - name: helper-pod
+          image: "rancher/mirrored-library-busybox:1.36.1"
+          imagePullPolicy: IfNotPresent
+    setup: |-
+      #!/bin/sh
+      set -eu
+      mkdir -m 0777 -p "${VOL_DIR}"
+      chmod 700 "${VOL_DIR}/.."
+    teardown: |-
+      #!/bin/sh
+      set -eu
+      rm -rf "${VOL_DIR}"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/4ySX2vbMBTFv4p2t0c7deb8Q7CHsLSsLG1Cl/VlAnMtybFq+0pYSkoJ+e5DCYFurNsepR/n6JyDDoDOPOreG0vAYT+EBBQGBH4Aaaky28GTP6GDIMYEkFV6jaG+QyeA/4iXJ3JhAriAxfXN/PtyU6znmy/FzeqhuF/dF8vbb5vrRQEJ1Lp1ul9bNXjBrgX+KgNn+6GgxpDibG2VoE4HjIF4fISw05yd5amL2DstT0haSMDrsHPA4f27q9LQla8FeR1YqneCukaZnqUdy6bTKUsdE/Dh8LhaFovbh6MAQbLurGLTLLsQSCBo7JV9pjc8+46lffWbExwTiAWAw+fTgnfoIIFLkbgsEtmAwVjy8WjLJy2D12HQGzuQGEKrB8ZemegByZvcPpPu0+2+AQ5N7l+R/TBhXw2pT3OlLP3TIu4KHForsU19sD1u9X+JvEMZlc2u1Kl/8UF3sX6LpW7/Wq1GXwOH4Syv8rGcjKuqlHk2GU2yvBrl1XA8y9RMTmb4UWGpRtH0l5AOQ52ePyic0R+jHH8GAAD//7kWEdfgAgAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+      objectset.rio.cattle.io/owner-name: local-storage
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2026-08-03T15:03:28Z"
+    labels:
+      objectset.rio.cattle.io/hash: 183f35c65ffbc3064603f43f1580d8c68a2dabd4
+    name: local-path-config
+    namespace: kube-system
+    resourceVersion: "317"
+    uid: 577c0fc0-5a29-428a-917a-13665f5652bd
+kind: List
+metadata:
+  resourceVersion: ""

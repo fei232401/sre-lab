@@ -1,0 +1,5272 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-08-08T17:20:03+08:00"
+    creationTimestamp: "2026-08-16T01:30:44Z"
+    generateName: ai-infra-gateway-6df8b89696-
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: 6df8b89696
+    name: ai-infra-gateway-6df8b89696-zjrsp
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: ai-infra-gateway-6df8b89696
+      uid: 0db5f831-9143-40e8-8264-00662fcb1c73
+    resourceVersion: "173746"
+    uid: 275ce40f-da9b-4b79-86f2-24fb2f445956
+  spec:
+    containers:
+    - env:
+      - name: PYTHONUNBUFFERED
+        value: "1"
+      image: ai-infra-gateway:v20
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 30
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: gateway
+      ports:
+      - containerPort: 8000
+        name: http
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /app/config
+        name: config
+        readOnly: true
+      - mountPath: /etc/cyberrouter
+        name: routing-snapshot
+        readOnly: true
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-mjqkg
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: k3d-ai-cluster-agent-1
+    nodeSelector:
+      node-role: cpu
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        name: gateway-config
+      name: config
+    - configMap:
+        defaultMode: 420
+        name: cyberrouter-routing-snapshot
+      name: routing-snapshot
+    - name: kube-api-access-mjqkg
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:24:53Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-08-16T01:30:44Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:25:01Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:25:01Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-08-16T01:30:44Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://9f5691b4de72d248408e75ceb9a4d015c8124128e6d5081aadcd403cbf1f67ff
+      image: docker.io/library/ai-infra-gateway:v20
+      imageID: sha256:18f99286656a447b784b1eb8c82ef161c43d9c5cd05b89d978ce2692df3b94ed
+      lastState:
+        terminated:
+          containerID: containerd://9f72aef35623da76c2c6c2f75270a06b53759557b71b1988b41a0353dbd1db95
+          exitCode: 255
+          finishedAt: "2026-09-15T14:24:50Z"
+          reason: Unknown
+          startedAt: "2026-09-12T08:54:15Z"
+      name: gateway
+      ready: true
+      restartCount: 6
+      started: true
+      state:
+        running:
+          startedAt: "2026-09-15T14:24:53Z"
+      volumeMounts:
+      - mountPath: /app/config
+        name: config
+        readOnly: true
+        recursiveReadOnly: Disabled
+      - mountPath: /etc/cyberrouter
+        name: routing-snapshot
+        readOnly: true
+        recursiveReadOnly: Disabled
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-mjqkg
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 172.18.0.3
+    hostIPs:
+    - ip: 172.18.0.3
+    phase: Running
+    podIP: 10.42.1.76
+    podIPs:
+    - ip: 10.42.1.76
+    qosClass: Burstable
+    startTime: "2026-08-16T01:30:44Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2026-08-06T13:40:51Z"
+    generateName: cyberrouter-operator-7f5db5bb78-
+    labels:
+      app: cyberrouter-operator
+      pod-template-hash: 7f5db5bb78
+    name: cyberrouter-operator-7f5db5bb78-h4q98
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: cyberrouter-operator-7f5db5bb78
+      uid: 462f3e4c-4686-41e4-9656-ef38e8893ac1
+    resourceVersion: "173773"
+    uid: 3813e7d6-653f-4cd6-b87d-4cf88ef33a4e
+  spec:
+    containers:
+    - env:
+      - name: VLLM_METRICS_URL
+        value: http://vllm-3b-service.ai-platform.svc.cluster.local:8000/metrics
+      image: cyberrouter-operator:v3
+      imagePullPolicy: Never
+      name: manager
+      ports:
+      - containerPort: 8080
+        name: metrics
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /healthz
+          port: 8081
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 200m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-9jrpb
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: k3d-ai-cluster-agent-1
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: cyberrouter-controller
+    serviceAccountName: cyberrouter-controller
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: kube-api-access-9jrpb
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:24:53Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-08-08T08:52:07Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:25:00Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:25:00Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-08-06T13:40:51Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://9477b2bfaca50aab23c85d265157372b77ea819aa3472e8cde4094ea96efc820
+      image: docker.io/library/cyberrouter-operator:v3
+      imageID: sha256:aceebe574b649025e95ce16cfb94ae3734d5da28ebc0b725a43da2860d77b8e8
+      lastState:
+        terminated:
+          containerID: containerd://f85866cdc7eda59157724530c15a56f4cd792e95378bd28eb203553788a784a8
+          exitCode: 255
+          finishedAt: "2026-09-15T14:24:50Z"
+          reason: Unknown
+          startedAt: "2026-09-12T08:54:16Z"
+      name: manager
+      ready: true
+      restartCount: 7
+      started: true
+      state:
+        running:
+          startedAt: "2026-09-15T14:24:53Z"
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-9jrpb
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 172.18.0.3
+    hostIPs:
+    - ip: 172.18.0.3
+    phase: Running
+    podIP: 10.42.1.78
+    podIPs:
+    - ip: 10.42.1.78
+    qosClass: Burstable
+    startTime: "2026-08-08T08:52:07Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2026-08-16T01:26:07Z"
+    generateName: ollama-675797866d-
+    labels:
+      app: ollama
+      pod-template-hash: 675797866d
+    name: ollama-675797866d-vrbtx
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: ollama-675797866d
+      uid: 0dc7cd58-794e-4f33-8e4e-dfb6b5918c7a
+    resourceVersion: "173787"
+    uid: b9a425d5-38ca-45bf-a527-a9306a2a8a85
+  spec:
+    containers:
+    - env:
+      - name: OLLAMA_HOST
+        value: 0.0.0.0
+      - name: OLLAMA_ORIGINS
+        value: '*'
+      image: ollama/ollama:latest
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /
+          port: 11434
+          scheme: HTTP
+        periodSeconds: 30
+        successThreshold: 1
+        timeoutSeconds: 10
+      name: ollama
+      ports:
+      - containerPort: 11434
+        name: api
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /api/tags
+          port: 11434
+          scheme: HTTP
+        periodSeconds: 15
+        successThreshold: 1
+        timeoutSeconds: 10
+      resources:
+        limits:
+          cpu: "2"
+          memory: 4Gi
+        requests:
+          cpu: 500m
+          memory: 2Gi
+      startupProbe:
+        failureThreshold: 30
+        httpGet:
+          path: /
+          port: 11434
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /root/.ollama
+        name: ollama-data
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-486hp
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: k3d-ai-cluster-agent-1
+    nodeSelector:
+      node-role: cpu
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: ollama-data
+      persistentVolumeClaim:
+        claimName: ollama-models
+    - name: kube-api-access-486hp
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:24:53Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-08-16T01:26:07Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:25:07Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:25:07Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-08-16T01:26:07Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://1da8fe246635d328a4ef9576ef135701679b5e9c469ed0f0331202b247de082d
+      image: docker.io/ollama/ollama:latest
+      imageID: docker.io/ollama/ollama@sha256:4dea9fb511947e24a84237bb636b0203abcb2ff0d3fbc7b4ff865deb91362131
+      lastState:
+        terminated:
+          containerID: containerd://752e4d159d6e5cdeccbe55cc7a70c6125eb9344e38f286e944cbe43b04eeb2de
+          exitCode: 255
+          finishedAt: "2026-09-15T14:24:50Z"
+          reason: Unknown
+          startedAt: "2026-09-12T08:54:15Z"
+      name: ollama
+      ready: true
+      restartCount: 6
+      started: true
+      state:
+        running:
+          startedAt: "2026-09-15T14:24:53Z"
+      volumeMounts:
+      - mountPath: /root/.ollama
+        name: ollama-data
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-486hp
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 172.18.0.3
+    hostIPs:
+    - ip: 172.18.0.3
+    phase: Running
+    podIP: 10.42.1.74
+    podIPs:
+    - ip: 10.42.1.74
+    qosClass: Burstable
+    startTime: "2026-08-16T01:26:07Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+    creationTimestamp: "2026-09-10T15:21:36Z"
+    generateName: vllm-3b-7c59d66664-
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7c59d66664
+    name: vllm-3b-7c59d66664-ddppp
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: vllm-3b-7c59d66664
+      uid: b320b456-bfab-45d2-bddc-4e313d687c6b
+    resourceVersion: "173499"
+    uid: 250367ce-9391-407c-a61c-a7384a2a03d8
+  spec:
+    containers:
+    - args:
+      - --model
+      - /models/qwen2.5-3b-awq
+      - --gpu-memory-utilization
+      - "0.8"
+      - --max-model-len
+      - "5000"
+      - --enforce-eager
+      - --max-num-seqs
+      - "16"
+      - --kv-transfer-config
+      - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+      env:
+      - name: LD_LIBRARY_PATH
+        value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+      - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+        value: "1"
+      - name: LMCACHE_CONFIG_FILE
+        value: /config/lmcache.yaml
+      image: vllm/vllm-openai:latest
+      imagePullPolicy: IfNotPresent
+      name: vllm
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 6
+        httpGet:
+          path: /health
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 15
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources:
+        limits:
+          cpu: "8"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+        requests:
+          cpu: "4"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-62v2v
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: k3d-ai-cluster-agent-0
+    nodeSelector:
+      nvidia.com/gpu: "true"
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - hostPath:
+        path: /dev/dxg
+        type: ""
+      name: dxg
+    - hostPath:
+        path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        type: ""
+      name: driver-lib
+    - hostPath:
+        path: /usr/lib/wsl/lib
+        type: ""
+      name: wsl-lib
+    - hostPath:
+        path: /home/fei/models
+        type: ""
+      name: model
+    - configMap:
+        defaultMode: 420
+        name: lmcache-config
+      name: lmcache-config
+    - name: kube-api-access-62v2v
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:24:54Z"
+      status: "False"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:24:54Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:24:54Z"
+      reason: PodFailed
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:24:54Z"
+      reason: PodFailed
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:24:54Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - image: vllm/vllm-openai:latest
+      imageID: ""
+      lastState: {}
+      name: vllm
+      ready: false
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          exitCode: 137
+          finishedAt: null
+          message: The container could not be located when the pod was terminated
+          reason: ContainerStatusUnknown
+          startedAt: null
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-62v2v
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 172.18.0.5
+    hostIPs:
+    - ip: 172.18.0.5
+    message: 'Pod was rejected: Allocate failed due to no healthy devices present;
+      cannot allocate unhealthy devices nvidia.com/gpu, which is unexpected'
+    phase: Failed
+    qosClass: Burstable
+    reason: UnexpectedAdmissionError
+    startTime: "2026-09-10T15:21:38Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+    creationTimestamp: "2026-09-08T11:51:25Z"
+    generateName: vllm-3b-7c59d66664-
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7c59d66664
+    name: vllm-3b-7c59d66664-jlns7
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: vllm-3b-7c59d66664
+      uid: b320b456-bfab-45d2-bddc-4e313d687c6b
+    resourceVersion: "173482"
+    uid: 284c448e-8e9d-4693-8574-00c5422d47e3
+  spec:
+    containers:
+    - args:
+      - --model
+      - /models/qwen2.5-3b-awq
+      - --gpu-memory-utilization
+      - "0.8"
+      - --max-model-len
+      - "5000"
+      - --enforce-eager
+      - --max-num-seqs
+      - "16"
+      - --kv-transfer-config
+      - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+      env:
+      - name: LD_LIBRARY_PATH
+        value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+      - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+        value: "1"
+      - name: LMCACHE_CONFIG_FILE
+        value: /config/lmcache.yaml
+      image: vllm/vllm-openai:latest
+      imagePullPolicy: IfNotPresent
+      name: vllm
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 6
+        httpGet:
+          path: /health
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 15
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources:
+        limits:
+          cpu: "8"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+        requests:
+          cpu: "4"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-rdtfz
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: k3d-ai-cluster-agent-0
+    nodeSelector:
+      nvidia.com/gpu: "true"
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - hostPath:
+        path: /dev/dxg
+        type: ""
+      name: dxg
+    - hostPath:
+        path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        type: ""
+      name: driver-lib
+    - hostPath:
+        path: /usr/lib/wsl/lib
+        type: ""
+      name: wsl-lib
+    - hostPath:
+        path: /home/fei/models
+        type: ""
+      name: model
+    - configMap:
+        defaultMode: 420
+        name: lmcache-config
+      name: lmcache-config
+    - name: kube-api-access-rdtfz
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-10T15:21:27Z"
+      status: "False"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-10T15:21:27Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-10T15:21:27Z"
+      reason: PodFailed
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-10T15:21:27Z"
+      reason: PodFailed
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-10T15:21:27Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - image: vllm/vllm-openai:latest
+      imageID: ""
+      lastState: {}
+      name: vllm
+      ready: false
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          exitCode: 137
+          finishedAt: null
+          message: The container could not be located when the pod was terminated
+          reason: ContainerStatusUnknown
+          startedAt: null
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-rdtfz
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 172.18.0.5
+    hostIPs:
+    - ip: 172.18.0.5
+    message: 'Pod was rejected: Allocate failed due to no healthy devices present;
+      cannot allocate unhealthy devices nvidia.com/gpu, which is unexpected'
+    phase: Failed
+    qosClass: Burstable
+    reason: UnexpectedAdmissionError
+    startTime: "2026-09-08T11:51:26Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+    creationTimestamp: "2026-08-16T01:20:02Z"
+    generateName: vllm-3b-7c59d66664-
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7c59d66664
+    name: vllm-3b-7c59d66664-qp4k6
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: vllm-3b-7c59d66664
+      uid: b320b456-bfab-45d2-bddc-4e313d687c6b
+    resourceVersion: "173463"
+    uid: fdcee0f3-819b-46f9-b6f6-d6f3a8fa526b
+  spec:
+    containers:
+    - args:
+      - --model
+      - /models/qwen2.5-3b-awq
+      - --gpu-memory-utilization
+      - "0.8"
+      - --max-model-len
+      - "5000"
+      - --enforce-eager
+      - --max-num-seqs
+      - "16"
+      - --kv-transfer-config
+      - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+      env:
+      - name: LD_LIBRARY_PATH
+        value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+      - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+        value: "1"
+      - name: LMCACHE_CONFIG_FILE
+        value: /config/lmcache.yaml
+      image: vllm/vllm-openai:latest
+      imagePullPolicy: IfNotPresent
+      name: vllm
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 6
+        httpGet:
+          path: /health
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 15
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources:
+        limits:
+          cpu: "8"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+        requests:
+          cpu: "4"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-9rlnc
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: k3d-ai-cluster-agent-0
+    nodeSelector:
+      nvidia.com/gpu: "true"
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - hostPath:
+        path: /dev/dxg
+        type: ""
+      name: dxg
+    - hostPath:
+        path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        type: ""
+      name: driver-lib
+    - hostPath:
+        path: /usr/lib/wsl/lib
+        type: ""
+      name: wsl-lib
+    - hostPath:
+        path: /home/fei/models
+        type: ""
+      name: model
+    - configMap:
+        defaultMode: 420
+        name: lmcache-config
+      name: lmcache-config
+    - name: kube-api-access-9rlnc
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-08T11:51:16Z"
+      status: "False"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-08T11:51:16Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-08T11:51:16Z"
+      reason: PodFailed
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-08T11:51:16Z"
+      reason: PodFailed
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-08T11:51:16Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - image: vllm/vllm-openai:latest
+      imageID: ""
+      lastState: {}
+      name: vllm
+      ready: false
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          exitCode: 137
+          finishedAt: null
+          message: The container could not be located when the pod was terminated
+          reason: ContainerStatusUnknown
+          startedAt: null
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-9rlnc
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 172.18.0.5
+    hostIPs:
+    - ip: 172.18.0.5
+    message: 'Pod was rejected: Allocate failed due to no healthy devices present;
+      cannot allocate unhealthy devices nvidia.com/gpu, which is unexpected'
+    phase: Failed
+    qosClass: Burstable
+    reason: UnexpectedAdmissionError
+    startTime: "2026-08-16T01:20:02Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+    creationTimestamp: "2026-09-12T08:54:24Z"
+    generateName: vllm-3b-7c59d66664-
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7c59d66664
+    name: vllm-3b-7c59d66664-t4jlb
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: vllm-3b-7c59d66664
+      uid: b320b456-bfab-45d2-bddc-4e313d687c6b
+    resourceVersion: "173662"
+    uid: 7d8736ac-f855-4d50-813a-8f2aeee063d7
+  spec:
+    containers:
+    - args:
+      - --model
+      - /models/qwen2.5-3b-awq
+      - --gpu-memory-utilization
+      - "0.8"
+      - --max-model-len
+      - "5000"
+      - --enforce-eager
+      - --max-num-seqs
+      - "16"
+      - --kv-transfer-config
+      - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+      env:
+      - name: LD_LIBRARY_PATH
+        value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+      - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+        value: "1"
+      - name: LMCACHE_CONFIG_FILE
+        value: /config/lmcache.yaml
+      image: vllm/vllm-openai:latest
+      imagePullPolicy: IfNotPresent
+      name: vllm
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 6
+        httpGet:
+          path: /health
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 15
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources:
+        limits:
+          cpu: "8"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+        requests:
+          cpu: "4"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-clsng
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: k3d-ai-cluster-agent-0
+    nodeSelector:
+      nvidia.com/gpu: "true"
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - hostPath:
+        path: /dev/dxg
+        type: ""
+      name: dxg
+    - hostPath:
+        path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        type: ""
+      name: driver-lib
+    - hostPath:
+        path: /usr/lib/wsl/lib
+        type: ""
+      name: wsl-lib
+    - hostPath:
+        path: /home/fei/models
+        type: ""
+      name: model
+    - configMap:
+        defaultMode: 420
+        name: lmcache-config
+      name: lmcache-config
+    - name: kube-api-access-clsng
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    message: 'Pod was rejected: Allocate failed due to no healthy devices present;
+      cannot allocate unhealthy devices nvidia.com/gpu, which is unexpected'
+    phase: Failed
+    reason: UnexpectedAdmissionError
+    startTime: "2026-09-12T08:54:25Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+    creationTimestamp: "2026-09-15T14:25:03Z"
+    generateName: vllm-3b-7c59d66664-
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7c59d66664
+    name: vllm-3b-7c59d66664-t86mv
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: vllm-3b-7c59d66664
+      uid: b320b456-bfab-45d2-bddc-4e313d687c6b
+    resourceVersion: "173766"
+    uid: 6185f09b-53eb-4951-b692-c93c66c9170f
+  spec:
+    containers:
+    - args:
+      - --model
+      - /models/qwen2.5-3b-awq
+      - --gpu-memory-utilization
+      - "0.8"
+      - --max-model-len
+      - "5000"
+      - --enforce-eager
+      - --max-num-seqs
+      - "16"
+      - --kv-transfer-config
+      - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+      env:
+      - name: LD_LIBRARY_PATH
+        value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+      - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+        value: "1"
+      - name: LMCACHE_CONFIG_FILE
+        value: /config/lmcache.yaml
+      image: vllm/vllm-openai:latest
+      imagePullPolicy: IfNotPresent
+      name: vllm
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 6
+        httpGet:
+          path: /health
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 15
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources:
+        limits:
+          cpu: "8"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+        requests:
+          cpu: "4"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-pwj45
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: k3d-ai-cluster-agent-0
+    nodeSelector:
+      nvidia.com/gpu: "true"
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - hostPath:
+        path: /dev/dxg
+        type: ""
+      name: dxg
+    - hostPath:
+        path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        type: ""
+      name: driver-lib
+    - hostPath:
+        path: /usr/lib/wsl/lib
+        type: ""
+      name: wsl-lib
+    - hostPath:
+        path: /home/fei/models
+        type: ""
+      name: model
+    - configMap:
+        defaultMode: 420
+        name: lmcache-config
+      name: lmcache-config
+    - name: kube-api-access-pwj45
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:25:06Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:25:02Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:26:17Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:26:17Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-15T14:25:02Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://ea24f56e0da29b0fca3058290906bd18d759872633068488c10212d43f3d22f3
+      image: docker.io/vllm/vllm-openai:latest
+      imageID: docker.io/vllm/vllm-openai@sha256:0a51ea5b4ae2dc5d81890e5173f54203d2a3ae0cfffe51b8fd2afd4391bfd967
+      lastState: {}
+      name: vllm
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-09-15T14:25:05Z"
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-pwj45
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 172.18.0.4
+    hostIPs:
+    - ip: 172.18.0.4
+    phase: Running
+    podIP: 10.42.0.119
+    podIPs:
+    - ip: 10.42.0.119
+    qosClass: Burstable
+    startTime: "2026-09-15T14:25:02Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+    creationTimestamp: "2026-08-28T10:27:07Z"
+    generateName: vllm-3b-7c59d66664-
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7c59d66664
+    name: vllm-3b-7c59d66664-v9mpx
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: vllm-3b-7c59d66664
+      uid: b320b456-bfab-45d2-bddc-4e313d687c6b
+    resourceVersion: "173465"
+    uid: fa7f1e6a-c517-4128-aa05-9e8df0d4edc4
+  spec:
+    containers:
+    - args:
+      - --model
+      - /models/qwen2.5-3b-awq
+      - --gpu-memory-utilization
+      - "0.8"
+      - --max-model-len
+      - "5000"
+      - --enforce-eager
+      - --max-num-seqs
+      - "16"
+      - --kv-transfer-config
+      - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+      env:
+      - name: LD_LIBRARY_PATH
+        value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+      - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+        value: "1"
+      - name: LMCACHE_CONFIG_FILE
+        value: /config/lmcache.yaml
+      image: vllm/vllm-openai:latest
+      imagePullPolicy: IfNotPresent
+      name: vllm
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 6
+        httpGet:
+          path: /health
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 15
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources:
+        limits:
+          cpu: "8"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+        requests:
+          cpu: "4"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-gszzn
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: k3d-ai-cluster-agent-0
+    nodeSelector:
+      nvidia.com/gpu: "true"
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - hostPath:
+        path: /dev/dxg
+        type: ""
+      name: dxg
+    - hostPath:
+        path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        type: ""
+      name: driver-lib
+    - hostPath:
+        path: /usr/lib/wsl/lib
+        type: ""
+      name: wsl-lib
+    - hostPath:
+        path: /home/fei/models
+        type: ""
+      name: model
+    - configMap:
+        defaultMode: 420
+        name: lmcache-config
+      name: lmcache-config
+    - name: kube-api-access-gszzn
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-09T13:30:49Z"
+      status: "False"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-09T13:30:49Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-09T13:30:49Z"
+      reason: PodFailed
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-09T13:30:49Z"
+      reason: PodFailed
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-09T13:30:49Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - image: vllm/vllm-openai:latest
+      imageID: ""
+      lastState: {}
+      name: vllm
+      ready: false
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          exitCode: 137
+          finishedAt: null
+          message: The container could not be located when the pod was terminated
+          reason: ContainerStatusUnknown
+          startedAt: null
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-gszzn
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 172.18.0.5
+    hostIPs:
+    - ip: 172.18.0.5
+    message: 'Pod was rejected: Allocate failed due to no healthy devices present;
+      cannot allocate unhealthy devices nvidia.com/gpu, which is unexpected'
+    phase: Failed
+    qosClass: Burstable
+    reason: UnexpectedAdmissionError
+    startTime: "2026-08-28T10:27:08Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+    creationTimestamp: "2026-09-09T13:30:58Z"
+    generateName: vllm-3b-7c59d66664-
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7c59d66664
+    name: vllm-3b-7c59d66664-w2jzp
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: vllm-3b-7c59d66664
+      uid: b320b456-bfab-45d2-bddc-4e313d687c6b
+    resourceVersion: "173502"
+    uid: 62e03b70-24b9-4e94-9c7a-784faf4c73d8
+  spec:
+    containers:
+    - args:
+      - --model
+      - /models/qwen2.5-3b-awq
+      - --gpu-memory-utilization
+      - "0.8"
+      - --max-model-len
+      - "5000"
+      - --enforce-eager
+      - --max-num-seqs
+      - "16"
+      - --kv-transfer-config
+      - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+      env:
+      - name: LD_LIBRARY_PATH
+        value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+      - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+        value: "1"
+      - name: LMCACHE_CONFIG_FILE
+        value: /config/lmcache.yaml
+      image: vllm/vllm-openai:latest
+      imagePullPolicy: IfNotPresent
+      name: vllm
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 6
+        httpGet:
+          path: /health
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 15
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources:
+        limits:
+          cpu: "8"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+        requests:
+          cpu: "4"
+          memory: 6Gi
+          nvidia.com/gpu: "1"
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-w8z86
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: k3d-ai-cluster-agent-0
+    nodeSelector:
+      nvidia.com/gpu: "true"
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - hostPath:
+        path: /dev/dxg
+        type: ""
+      name: dxg
+    - hostPath:
+        path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        type: ""
+      name: driver-lib
+    - hostPath:
+        path: /usr/lib/wsl/lib
+        type: ""
+      name: wsl-lib
+    - hostPath:
+        path: /home/fei/models
+        type: ""
+      name: model
+    - configMap:
+        defaultMode: 420
+        name: lmcache-config
+      name: lmcache-config
+    - name: kube-api-access-w8z86
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-12T08:54:15Z"
+      status: "False"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-12T08:54:15Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-12T08:54:15Z"
+      reason: PodFailed
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-12T08:54:15Z"
+      reason: PodFailed
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-12T08:54:15Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - image: vllm/vllm-openai:latest
+      imageID: ""
+      lastState: {}
+      name: vllm
+      ready: false
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          exitCode: 137
+          finishedAt: null
+          message: The container could not be located when the pod was terminated
+          reason: ContainerStatusUnknown
+          startedAt: null
+      volumeMounts:
+      - mountPath: /dev/dxg
+        name: dxg
+      - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+        name: driver-lib
+      - mountPath: /usr/lib/wsl/lib
+        name: wsl-lib
+      - mountPath: /models
+        name: model
+      - mountPath: /config
+        name: lmcache-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-w8z86
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 172.18.0.5
+    hostIPs:
+    - ip: 172.18.0.5
+    message: 'Pod was rejected: Allocate failed due to no healthy devices present;
+      cannot allocate unhealthy devices nvidia.com/gpu, which is unexpected'
+    phase: Failed
+    qosClass: Burstable
+    reason: UnexpectedAdmissionError
+    startTime: "2026-09-09T13:31:00Z"
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"ai-infra-gateway","app.kubernetes.io/part-of":"gateway"},"name":"ai-infra-gateway","namespace":"ai-platform"},"spec":{"ports":[{"name":"http","port":8000,"targetPort":8000}],"selector":{"app":"ai-infra-gateway"},"type":"ClusterIP"}}
+    creationTimestamp: "2026-08-06T12:50:13Z"
+    labels:
+      app: ai-infra-gateway
+      app.kubernetes.io/part-of: gateway
+    name: ai-infra-gateway
+    namespace: ai-platform
+    resourceVersion: "17520"
+    uid: 93f18123-0751-4caa-841d-4ed8051557cf
+  spec:
+    clusterIP: 10.43.77.79
+    clusterIPs:
+    - 10.43.77.79
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+    selector:
+      app: ai-infra-gateway
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"ollama"},"name":"ollama-service","namespace":"ai-platform"},"spec":{"ports":[{"name":"api","port":11434,"targetPort":11434}],"selector":{"app":"ollama"},"type":"ClusterIP"}}
+    creationTimestamp: "2026-08-03T15:54:07Z"
+    labels:
+      app: ollama
+    name: ollama-service
+    namespace: ai-platform
+    resourceVersion: "3087"
+    uid: 29d5a13b-553c-41ee-bda1-3c4907de70c3
+  spec:
+    clusterIP: 10.43.64.134
+    clusterIPs:
+    - 10.43.64.134
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: api
+      port: 11434
+      protocol: TCP
+      targetPort: 11434
+    selector:
+      app: ollama
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"vllm-3b"},"name":"vllm-3b-service","namespace":"ai-platform"},"spec":{"ports":[{"name":"api","port":8000,"targetPort":8000}],"selector":{"app":"vllm-3b"},"type":"ClusterIP"}}
+    creationTimestamp: "2026-08-04T23:58:20Z"
+    labels:
+      app: vllm-3b
+    name: vllm-3b-service
+    namespace: ai-platform
+    resourceVersion: "7893"
+    uid: 38e179c1-6d62-4328-8aa2-7c4a6918c9af
+  spec:
+    clusterIP: 10.43.114.20
+    clusterIPs:
+    - 10.43.114.20
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: api
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+    selector:
+      app: vllm-3b
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "12"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"ai-infra-gateway","app.kubernetes.io/part-of":"gateway"},"name":"ai-infra-gateway","namespace":"ai-platform"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"ai-infra-gateway"}},"template":{"metadata":{"labels":{"app":"ai-infra-gateway"}},"spec":{"containers":[{"env":[{"name":"PYTHONUNBUFFERED","value":"1"}],"image":"ai-infra-gateway:v18","imagePullPolicy":"Never","livenessProbe":{"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":10,"periodSeconds":30},"name":"gateway","ports":[{"containerPort":8000,"name":"http"}],"readinessProbe":{"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":5,"periodSeconds":10},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"volumeMounts":[{"mountPath":"/app/config","name":"config","readOnly":true},{"mountPath":"/etc/cyberrouter","name":"routing-snapshot","readOnly":true}]}],"nodeSelector":{"node-role":"cpu"},"volumes":[{"configMap":{"name":"gateway-config"},"name":"config"},{"configMap":{"name":"cyberrouter-routing-snapshot"},"name":"routing-snapshot"}]}}}}
+    creationTimestamp: "2026-08-06T12:50:13Z"
+    generation: 12
+    labels:
+      app: ai-infra-gateway
+      app.kubernetes.io/part-of: gateway
+    name: ai-infra-gateway
+    namespace: ai-platform
+    resourceVersion: "173646"
+    uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-08T17:20:03+08:00"
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v20
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          node-role: cpu
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-08-08T09:18:39Z"
+      lastUpdateTime: "2026-08-16T01:30:55Z"
+      message: ReplicaSet "ai-infra-gateway-6df8b89696" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-09-15T14:25:01Z"
+      lastUpdateTime: "2026-09-15T14:25:01Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 12
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"cyberrouter-operator"},"name":"cyberrouter-operator","namespace":"ai-platform"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"cyberrouter-operator"}},"template":{"metadata":{"labels":{"app":"cyberrouter-operator"}},"spec":{"containers":[{"env":[{"name":"VLLM_METRICS_URL","value":"http://vllm-3b-service.ai-platform.svc.cluster.local:8000/metrics"}],"image":"cyberrouter-operator:v3","imagePullPolicy":"Never","name":"manager","ports":[{"containerPort":8080,"name":"metrics"}],"readinessProbe":{"httpGet":{"path":"/healthz","port":8081},"initialDelaySeconds":5,"periodSeconds":10},"resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}}],"serviceAccountName":"cyberrouter-controller"}}}}
+    creationTimestamp: "2026-08-06T13:10:46Z"
+    generation: 2
+    labels:
+      app: cyberrouter-operator
+    name: cyberrouter-operator
+    namespace: ai-platform
+    resourceVersion: "173629"
+    uid: 31e917d3-bf15-4e1f-82f7-50cc3af4ac11
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: cyberrouter-operator
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: cyberrouter-operator
+      spec:
+        containers:
+        - env:
+          - name: VLLM_METRICS_URL
+            value: http://vllm-3b-service.ai-platform.svc.cluster.local:8000/metrics
+          image: cyberrouter-operator:v3
+          imagePullPolicy: Never
+          name: manager
+          ports:
+          - containerPort: 8080
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: cyberrouter-controller
+        serviceAccountName: cyberrouter-controller
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-08-06T13:10:46Z"
+      lastUpdateTime: "2026-08-06T13:28:19Z"
+      message: ReplicaSet "cyberrouter-operator-7f5db5bb78" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-09-15T14:25:00Z"
+      lastUpdateTime: "2026-09-15T14:25:00Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"ollama"},"name":"ollama","namespace":"ai-platform"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"ollama"}},"template":{"metadata":{"labels":{"app":"ollama"}},"spec":{"containers":[{"env":[{"name":"OLLAMA_HOST","value":"0.0.0.0"},{"name":"OLLAMA_ORIGINS","value":"*"}],"image":"ollama/ollama:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/","port":11434},"initialDelaySeconds":0,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":10},"name":"ollama","ports":[{"containerPort":11434,"name":"api"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/api/tags","port":11434},"initialDelaySeconds":0,"periodSeconds":15,"successThreshold":1,"timeoutSeconds":10},"resources":{"limits":{"cpu":"2","memory":"4Gi"},"requests":{"cpu":"500m","memory":"2Gi"}},"startupProbe":{"failureThreshold":30,"httpGet":{"path":"/","port":11434},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5},"volumeMounts":[{"mountPath":"/root/.ollama","name":"ollama-data"}]}],"nodeSelector":{"node-role":"cpu"},"volumes":[{"name":"ollama-data","persistentVolumeClaim":{"claimName":"ollama-models"}}]}}}}
+    creationTimestamp: "2026-08-03T15:54:07Z"
+    generation: 5
+    labels:
+      app: ollama
+    name: ollama
+    namespace: ai-platform
+    resourceVersion: "173692"
+    uid: 9331467c-46a0-4ce5-b347-07a9915db448
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: ollama
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ollama
+      spec:
+        containers:
+        - env:
+          - name: OLLAMA_HOST
+            value: 0.0.0.0
+          - name: OLLAMA_ORIGINS
+            value: '*'
+          image: ollama/ollama:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 11434
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: ollama
+          ports:
+          - containerPort: 11434
+            name: api
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/tags
+              port: 11434
+              scheme: HTTP
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 10
+          resources:
+            limits:
+              cpu: "2"
+              memory: 4Gi
+            requests:
+              cpu: 500m
+              memory: 2Gi
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /
+              port: 11434
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /root/.ollama
+            name: ollama-data
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          node-role: cpu
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: ollama-models
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-08-03T15:54:07Z"
+      lastUpdateTime: "2026-08-03T16:01:41Z"
+      message: ReplicaSet "ollama-675797866d" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-09-15T14:25:07Z"
+      lastUpdateTime: "2026-09-15T14:25:07Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 5
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "25"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"vllm-3b"},"name":"vllm-3b","namespace":"ai-platform"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"vllm-3b"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"labels":{"app":"vllm-3b"}},"spec":{"containers":[{"args":["--model","/models/qwen2.5-3b-awq","--gpu-memory-utilization","0.8","--max-model-len","5000","--enforce-eager","--max-num-seqs","16","--kv-transfer-config","{\"kv_connector\":\"LMCacheConnectorV1\",\"kv_role\":\"kv_both\",\"kv_buffer_size\":100000000}"],"env":[{"name":"LD_LIBRARY_PATH","value":"/usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64"},{"name":"VLLM_WSL2_ENABLE_PIN_MEMORY","value":"1"},{"name":"LMCACHE_CONFIG_FILE","value":"/config/lmcache.yaml"}],"image":"vllm/vllm-openai:latest","name":"vllm","ports":[{"containerPort":8000}],"readinessProbe":{"failureThreshold":6,"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":60,"periodSeconds":15,"timeoutSeconds":5},"resources":{"limits":{"cpu":"8","memory":"6Gi","nvidia.com/gpu":"1"},"requests":{"cpu":"4","memory":"6Gi"}},"securityContext":{"privileged":true},"volumeMounts":[{"mountPath":"/dev/dxg","name":"dxg"},{"mountPath":"/usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127","name":"driver-lib"},{"mountPath":"/usr/lib/wsl/lib","name":"wsl-lib"},{"mountPath":"/models","name":"model"},{"mountPath":"/config","name":"lmcache-config"}]}],"nodeSelector":{"nvidia.com/gpu":"true"},"volumes":[{"hostPath":{"path":"/dev/dxg"},"name":"dxg"},{"hostPath":{"path":"/usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127"},"name":"driver-lib"},{"hostPath":{"path":"/usr/lib/wsl/lib"},"name":"wsl-lib"},{"hostPath":{"path":"/home/fei/models"},"name":"model"},{"configMap":{"name":"lmcache-config"},"name":"lmcache-config"}]}}}}
+    creationTimestamp: "2026-08-05T00:26:47Z"
+    generation: 26
+    labels:
+      app: vllm-3b
+    name: vllm-3b
+    namespace: ai-platform
+    resourceVersion: "173770"
+    uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: vllm-3b
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.8"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "16"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: IfNotPresent
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-08-05T00:26:47Z"
+      lastUpdateTime: "2026-08-16T01:21:14Z"
+      message: ReplicaSet "vllm-3b-7c59d66664" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-09-15T14:26:17Z"
+      lastUpdateTime: "2026-09-15T14:26:17Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 26
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "6"
+    creationTimestamp: "2026-08-08T08:58:57Z"
+    generation: 2
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: 58f9599584
+    name: ai-infra-gateway-58f9599584
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "21044"
+    uid: cf7c76cd-d9c6-480d-bbea-3c664201e07e
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: 58f9599584
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: 58f9599584
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v17
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "5"
+    creationTimestamp: "2026-08-06T13:21:48Z"
+    generation: 2
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: 5f8d765bf5
+    name: ai-infra-gateway-5f8d765bf5
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "21083"
+    uid: c998673f-bd02-44a6-b6cf-eb64869a24fd
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: 5f8d765bf5
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: 5f8d765bf5
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v16
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "12"
+    creationTimestamp: "2026-08-16T01:30:44Z"
+    generation: 1
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: 6df8b89696
+    name: ai-infra-gateway-6df8b89696
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "173645"
+    uid: 0db5f831-9143-40e8-8264-00662fcb1c73
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: 6df8b89696
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-08T17:20:03+08:00"
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: 6df8b89696
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v20
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          node-role: cpu
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "11"
+    creationTimestamp: "2026-08-16T01:24:57Z"
+    generation: 3
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: 756dd5b84
+    name: ai-infra-gateway-756dd5b84
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "42121"
+    uid: 3d7fc382-6d09-4913-a7b9-963122171a85
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: 756dd5b84
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-08T17:20:03+08:00"
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: 756dd5b84
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v19
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          node-role: cpu
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    observedGeneration: 3
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "10"
+    creationTimestamp: "2026-08-16T01:24:57Z"
+    generation: 2
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: 75dc9f996f
+    name: ai-infra-gateway-75dc9f996f
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "41766"
+    uid: 4670f99d-3099-45cb-9ee5-060d8abd952c
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: 75dc9f996f
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-08T17:20:03+08:00"
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: 75dc9f996f
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v19
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          node-role: cpu
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "8"
+    creationTimestamp: "2026-08-08T09:20:03Z"
+    generation: 2
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: 77d8556775
+    name: ai-infra-gateway-77d8556775
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "21268"
+    uid: fe436a6e-4a9a-4c71-8542-0220c9b118de
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: 77d8556775
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-08T17:20:03+08:00"
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: 77d8556775
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v17
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          node-role: cpu
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "3"
+    creationTimestamp: "2026-08-06T13:00:21Z"
+    generation: 2
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: 7bfcdb558f
+    name: ai-infra-gateway-7bfcdb558f
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "18695"
+    uid: 4b89155d-45a3-4f88-ab2b-f6ed37a2d6d2
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: 7bfcdb558f
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: 7bfcdb558f
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v14
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "2"
+    creationTimestamp: "2026-08-06T12:57:17Z"
+    generation: 2
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: 7c58f7c484
+    name: ai-infra-gateway-7c58f7c484
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "17983"
+    uid: 682aeeed-3c15-417a-9c8a-2fca2a2a0526
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: 7c58f7c484
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: 7c58f7c484
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v13
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "7"
+    creationTimestamp: "2026-08-08T09:18:39Z"
+    generation: 3
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: 7dbc8556db
+    name: ai-infra-gateway-7dbc8556db
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "21158"
+    uid: fa884f9b-ba18-4c9d-81d5-eac88aa90947
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: 7dbc8556db
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: 7dbc8556db
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v17
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          node-role: cpu
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    observedGeneration: 3
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "9"
+    creationTimestamp: "2026-08-08T09:22:29Z"
+    generation: 2
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: d7cc4cddd
+    name: ai-infra-gateway-d7cc4cddd
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "41808"
+    uid: 55a4bbb3-f948-4f3e-8ab0-61c3d7369f3a
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: d7cc4cddd
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-08T17:20:03+08:00"
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: d7cc4cddd
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v18
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          node-role: cpu
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "4"
+    creationTimestamp: "2026-08-06T13:18:23Z"
+    generation: 2
+    labels:
+      app: ai-infra-gateway
+      pod-template-hash: f744f7f46
+    name: ai-infra-gateway-f744f7f46
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ai-infra-gateway
+      uid: 34c38e53-a1a7-4286-a63b-3229a2df1f1a
+    resourceVersion: "18849"
+    uid: 223c6d07-2efd-4a4c-a473-bd90aa76ae48
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: ai-infra-gateway
+        pod-template-hash: f744f7f46
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ai-infra-gateway
+          pod-template-hash: f744f7f46
+      spec:
+        containers:
+        - env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          image: ai-infra-gateway:v15
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: config
+            readOnly: true
+          - mountPath: /etc/cyberrouter
+            name: routing-snapshot
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: gateway-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: cyberrouter-routing-snapshot
+          name: routing-snapshot
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: "2026-08-06T13:10:46Z"
+    generation: 2
+    labels:
+      app: cyberrouter-operator
+      pod-template-hash: 64467fc7f7
+    name: cyberrouter-operator-64467fc7f7
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: cyberrouter-operator
+      uid: 31e917d3-bf15-4e1f-82f7-50cc3af4ac11
+    resourceVersion: "19177"
+    uid: 29cf32ac-784d-4e52-8ea9-6f828c3f1fb9
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: cyberrouter-operator
+        pod-template-hash: 64467fc7f7
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: cyberrouter-operator
+          pod-template-hash: 64467fc7f7
+      spec:
+        containers:
+        - env:
+          - name: VLLM_METRICS_URL
+            value: http://vllm-3b-service.ai-platform.svc.cluster.local:8000/metrics
+          image: cyberrouter-operator:v2
+          imagePullPolicy: Never
+          name: manager
+          ports:
+          - containerPort: 8080
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: cyberrouter-controller
+        serviceAccountName: cyberrouter-controller
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "2"
+    creationTimestamp: "2026-08-06T13:28:11Z"
+    generation: 1
+    labels:
+      app: cyberrouter-operator
+      pod-template-hash: 7f5db5bb78
+    name: cyberrouter-operator-7f5db5bb78
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: cyberrouter-operator
+      uid: 31e917d3-bf15-4e1f-82f7-50cc3af4ac11
+    resourceVersion: "173628"
+    uid: 462f3e4c-4686-41e4-9656-ef38e8893ac1
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: cyberrouter-operator
+        pod-template-hash: 7f5db5bb78
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: cyberrouter-operator
+          pod-template-hash: 7f5db5bb78
+      spec:
+        containers:
+        - env:
+          - name: VLLM_METRICS_URL
+            value: http://vllm-3b-service.ai-platform.svc.cluster.local:8000/metrics
+          image: cyberrouter-operator:v3
+          imagePullPolicy: Never
+          name: manager
+          ports:
+          - containerPort: 8080
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: cyberrouter-controller
+        serviceAccountName: cyberrouter-controller
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: "2026-08-03T15:54:07Z"
+    generation: 5
+    labels:
+      app: ollama
+      pod-template-hash: 675797866d
+    name: ollama-675797866d
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: ollama
+      uid: 9331467c-46a0-4ce5-b347-07a9915db448
+    resourceVersion: "173691"
+    uid: 0dc7cd58-794e-4f33-8e4e-dfb6b5918c7a
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: ollama
+        pod-template-hash: 675797866d
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ollama
+          pod-template-hash: 675797866d
+      spec:
+        containers:
+        - env:
+          - name: OLLAMA_HOST
+            value: 0.0.0.0
+          - name: OLLAMA_ORIGINS
+            value: '*'
+          image: ollama/ollama:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 11434
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: ollama
+          ports:
+          - containerPort: 11434
+            name: api
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/tags
+              port: 11434
+              scheme: HTTP
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 10
+          resources:
+            limits:
+              cpu: "2"
+              memory: 4Gi
+            requests:
+              cpu: 500m
+              memory: 2Gi
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /
+              port: 11434
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /root/.ollama
+            name: ollama-data
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          node-role: cpu
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: ollama-models
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 5
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "1"
+      deployment.kubernetes.io/revision: "23"
+      deployment.kubernetes.io/revision-history: 5,7,9,16,20
+    creationTimestamp: "2026-08-06T10:22:31Z"
+    generation: 13
+    labels:
+      app: vllm-3b
+      pod-template-hash: 55944667c7
+    name: vllm-3b-55944667c7
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "16328"
+    uid: 96f98ab9-6b6c-433c-9f63-5f8f4f02b2ab
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: 55944667c7
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: 55944667c7
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.55"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "4"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: Always
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    observedGeneration: 13
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "1"
+      deployment.kubernetes.io/revision: "22"
+    creationTimestamp: "2026-08-06T11:56:51Z"
+    generation: 2
+    labels:
+      app: vllm-3b
+      pod-template-hash: 57d794d997
+    name: vllm-3b-57d794d997
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "16032"
+    uid: 427031cb-d93d-42c0-85da-f9651e685f90
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: 57d794d997
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: 57d794d997
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.55"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "8"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: Always
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "3"
+    creationTimestamp: "2026-08-06T10:16:59Z"
+    generation: 3
+    labels:
+      app: vllm-3b
+      pod-template-hash: 5d49f9ffc9
+    name: vllm-3b-5d49f9ffc9
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "11328"
+    uid: 3cbf1294-2f43-4880-8206-d6067504191e
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: 5d49f9ffc9
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:16:59+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: 5d49f9ffc9
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.7"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "8"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: Always
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    observedGeneration: 3
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "4"
+    creationTimestamp: "2026-08-06T10:22:31Z"
+    generation: 3
+    labels:
+      app: vllm-3b
+      pod-template-hash: 65c798ccdd
+    name: vllm-3b-65c798ccdd
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "11353"
+    uid: c0e1a90a-b4b5-4940-a0c3-1588bb256458
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: 65c798ccdd
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:16:59+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: 65c798ccdd
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.55"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "4"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: Always
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    observedGeneration: 3
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "1"
+      deployment.kubernetes.io/revision: "12"
+    creationTimestamp: "2026-08-06T10:44:02Z"
+    generation: 2
+    labels:
+      app: vllm-3b
+      pod-template-hash: 6d46c4d8b7
+    name: vllm-3b-6d46c4d8b7
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "12472"
+    uid: f7890466-9ac2-4a83-96d4-47372f046d47
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: 6d46c4d8b7
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: 6d46c4d8b7
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.8"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "4"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: Always
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "1"
+      deployment.kubernetes.io/revision: "25"
+    creationTimestamp: "2026-08-16T01:20:02Z"
+    generation: 1
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7c59d66664
+    name: vllm-3b-7c59d66664
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "173769"
+    uid: b320b456-bfab-45d2-bddc-4e313d687c6b
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: 7c59d66664
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: 7c59d66664
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.8"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "16"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: IfNotPresent
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "1"
+      deployment.kubernetes.io/revision: "24"
+      deployment.kubernetes.io/revision-history: 13,19
+    creationTimestamp: "2026-08-06T10:45:25Z"
+    generation: 6
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7c96fd8d54
+    name: vllm-3b-7c96fd8d54
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "41314"
+    uid: 7b6915c9-0e74-4491-afff-cd64a968a59c
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: 7c96fd8d54
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: 7c96fd8d54
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.8"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "16"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: Always
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    observedGeneration: 6
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "1"
+      deployment.kubernetes.io/revision: "14"
+    creationTimestamp: "2026-08-06T10:46:47Z"
+    generation: 2
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7d7f9677cb
+    name: vllm-3b-7d7f9677cb
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "12643"
+    uid: 3ccf47f1-819e-4e0b-b135-a4d267881e0f
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: 7d7f9677cb
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: 7d7f9677cb
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.8"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "32"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: Always
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    observedGeneration: 2
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "1"
+      deployment.kubernetes.io/revision: "8"
+      deployment.kubernetes.io/revision-history: "6"
+    creationTimestamp: "2026-08-06T10:27:56Z"
+    generation: 4
+    labels:
+      app: vllm-3b
+      pod-template-hash: 7fbfbd79b4
+    name: vllm-3b-7fbfbd79b4
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "11899"
+    uid: 9fdc7011-9d0b-4ac5-bdbe-81f663df90f7
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: 7fbfbd79b4
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: 7fbfbd79b4
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.7"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "8"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: Always
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    observedGeneration: 4
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "1"
+      deployment.kubernetes.io/revision: "21"
+      deployment.kubernetes.io/revision-history: 11,17
+    creationTimestamp: "2026-08-06T10:36:56Z"
+    generation: 6
+    labels:
+      app: vllm-3b
+      pod-template-hash: 844fcbfc78
+    name: vllm-3b-844fcbfc78
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "15501"
+    uid: 000d82e0-0f9c-42b5-bf51-fa349dda734e
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: 844fcbfc78
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: 844fcbfc78
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.9"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "8"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: Always
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    observedGeneration: 6
+    replicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "1"
+      deployment.kubernetes.io/revision: "18"
+      deployment.kubernetes.io/revision-history: 10,15
+    creationTimestamp: "2026-08-06T10:35:35Z"
+    generation: 6
+    labels:
+      app: vllm-3b
+      pod-template-hash: c48f9f66c
+    name: vllm-3b-c48f9f66c
+    namespace: ai-platform
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: vllm-3b
+      uid: 45380b79-10f5-44e1-a131-8a1c0c1e4f00
+    resourceVersion: "14138"
+    uid: 68984981-40db-452d-875e-e09527916a36
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: vllm-3b
+        pod-template-hash: c48f9f66c
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-08-06T18:22:31+08:00"
+        creationTimestamp: null
+        labels:
+          app: vllm-3b
+          pod-template-hash: c48f9f66c
+      spec:
+        containers:
+        - args:
+          - --model
+          - /models/qwen2.5-3b-awq
+          - --gpu-memory-utilization
+          - "0.8"
+          - --max-model-len
+          - "5000"
+          - --enforce-eager
+          - --max-num-seqs
+          - "8"
+          - --kv-transfer-config
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_buffer_size":100000000}'
+          env:
+          - name: LD_LIBRARY_PATH
+            value: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127:/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+          - name: VLLM_WSL2_ENABLE_PIN_MEMORY
+            value: "1"
+          - name: LMCACHE_CONFIG_FILE
+            value: /config/lmcache.yaml
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: Always
+          name: vllm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "8"
+              memory: 6Gi
+              nvidia.com/gpu: "1"
+            requests:
+              cpu: "4"
+              memory: 6Gi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/dxg
+            name: dxg
+          - mountPath: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            name: driver-lib
+          - mountPath: /usr/lib/wsl/lib
+            name: wsl-lib
+          - mountPath: /models
+            name: model
+          - mountPath: /config
+            name: lmcache-config
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /dev/dxg
+            type: ""
+          name: dxg
+        - hostPath:
+            path: /usr/lib/wsl/drivers/nvtfi.inf_amd64_b747199a5b009127
+            type: ""
+          name: driver-lib
+        - hostPath:
+            path: /usr/lib/wsl/lib
+            type: ""
+          name: wsl-lib
+        - hostPath:
+            path: /home/fei/models
+            type: ""
+          name: model
+        - configMap:
+            defaultMode: 420
+            name: lmcache-config
+          name: lmcache-config
+  status:
+    observedGeneration: 6
+    replicas: 0
+kind: List
+metadata:
+  resourceVersion: ""

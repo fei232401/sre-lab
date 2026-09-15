@@ -1,0 +1,222 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    snapshot.json: |-
+      {
+        "version": "1",
+        "policyName": "cost-first-default",
+        "rolloutPercentage": 100,
+        "rules": [
+          {
+            "id": "rule-001",
+            "priority": 100,
+            "condition": {
+              "tokenCount": "\u003c 200",
+              "cacheHitProbability": "\u003e 0.5"
+            },
+            "action": {
+              "tier": "ollama-service",
+              "fallbackChain": [
+                "ollama-service",
+                "vllm-3b-service"
+              ]
+            }
+          },
+          {
+            "id": "rule-002",
+            "priority": 90,
+            "condition": {
+              "complexity": "high"
+            },
+            "action": {
+              "tier": "vllm-3b-service",
+              "fallbackChain": [
+                "vllm-3b-service",
+                "ollama-service"
+              ]
+            }
+          }
+        ],
+        "slo": {
+          "low": 200,
+          "medium": 1000,
+          "high": 5000
+        },
+        "generation": 4,
+        "tiers": [
+          {
+            "name": "vllm-3b-service",
+            "healthy": true,
+            "predictedP99Ms": 300,
+            "marginalMs": 80
+          }
+        ]
+      }
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-08-06T12:35:20Z"
+    labels:
+      app.kubernetes.io/part-of: cyberrouter
+    name: cyberrouter-routing-snapshot
+    namespace: ai-platform
+    resourceVersion: "173775"
+    uid: ad6e162a-0c53-48b9-9e99-cd946292f726
+- apiVersion: v1
+  data:
+    gateway_config.yaml: |
+      server:
+        host: "0.0.0.0"
+        port: 8000
+
+      ollama:
+        base_url: "http://ollama-service:11434"
+        default_model: "qwen2.5:1.5b"
+        timeout: 120
+
+      auth:
+        enabled: false
+        jwt_secret: "ai-infra-gateway-jwt-secret-key-2026"
+        jwt_algorithm: "HS256"
+        jwt_expire_minutes: 60
+        api_keys:
+          - "sk-infra-gateway-dev-key-2026"
+
+      rate_limit:
+        enabled: true
+        capacity: 10
+        refill_rate: 5
+
+      circuit_breaker:
+        enabled: true
+        failure_threshold: 3
+        timeout_seconds: 30
+        half_open_requests: 1
+
+      retry:
+        enabled: true
+        max_attempts: 2
+        backoff_seconds: 1
+
+      # cache-aware 动态加权 (CyberRouter §5.1 联动): 判定 tier 过载时, 用实测命中率打折预判 P99
+      #   命中率高 → 缓存请求廉价 (免 prefill) → 有效 P99 低 → tier 更不易被降级走 (等价"权重上调")
+      # boost: 折扣系数, 0=关闭, 0.5=满命中时有效 P99 减半 (启发式初值, 需真实负载标定)
+      cache_aware:
+        boost: 0.5
+
+      backends:
+        cpu_ollama:
+          base_url: "http://ollama-service:11434"
+          type: "ollama"
+          models:
+            - "qwen2.5:1.5b"
+            - "qwen2.5:3b"
+            - "qwen2.5"
+        gpu_vllm:
+          base_url: "http://vllm-3b-service:8000"
+          type: "vllm_openai"
+          models:
+            - "qwen2.5-3b-awq"
+            - "qwen2.5:3b"
+
+      # CyberRouter 数据面: 快照 tier 名 → 实际后端 (快照优先路由, 见 route_request)
+      # default_model: 路由到此 tier 时, 请求 model 名映射为该后端支持的模型
+      tiers:
+        ollama-service:
+          base_url: "http://ollama-service:11434"
+          type: "ollama"
+          default_model: "qwen2.5:1.5b"
+        vllm-3b-service:
+          base_url: "http://vllm-3b-service:8000"
+          type: "vllm_openai"
+          default_model: "/models/qwen2.5-3b-awq"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"gateway_config.yaml":"server:\n  host: \"0.0.0.0\"\n  port: 8000\n\nollama:\n  base_url: \"http://ollama-service:11434\"\n  default_model: \"qwen2.5:1.5b\"\n  timeout: 120\n\nauth:\n  enabled: false\n  jwt_secret: \"ai-infra-gateway-jwt-secret-key-2026\"\n  jwt_algorithm: \"HS256\"\n  jwt_expire_minutes: 60\n  api_keys:\n    - \"sk-infra-gateway-dev-key-2026\"\n\nrate_limit:\n  enabled: true\n  capacity: 10\n  refill_rate: 5\n\ncircuit_breaker:\n  enabled: true\n  failure_threshold: 3\n  timeout_seconds: 30\n  half_open_requests: 1\n\nretry:\n  enabled: true\n  max_attempts: 2\n  backoff_seconds: 1\n\n# cache-aware 动态加权 (CyberRouter §5.1 联动): 判定 tier 过载时, 用实测命中率打折预判 P99\n#   命中率高 → 缓存请求廉价 (免 prefill) → 有效 P99 低 → tier 更不易被降级走 (等价\"权重上调\")\n# boost: 折扣系数, 0=关闭, 0.5=满命中时有效 P99 减半 (启发式初值, 需真实负载标定)\ncache_aware:\n  boost: 0.5\n\nbackends:\n  cpu_ollama:\n    base_url: \"http://ollama-service:11434\"\n    type: \"ollama\"\n    models:\n      - \"qwen2.5:1.5b\"\n      - \"qwen2.5:3b\"\n      - \"qwen2.5\"\n  gpu_vllm:\n    base_url: \"http://vllm-3b-service:8000\"\n    type: \"vllm_openai\"\n    models:\n      - \"qwen2.5-3b-awq\"\n      - \"qwen2.5:3b\"\n\n# CyberRouter 数据面: 快照 tier 名 → 实际后端 (快照优先路由, 见 route_request)\n# default_model: 路由到此 tier 时, 请求 model 名映射为该后端支持的模型\ntiers:\n  ollama-service:\n    base_url: \"http://ollama-service:11434\"\n    type: \"ollama\"\n    default_model: \"qwen2.5:1.5b\"\n  vllm-3b-service:\n    base_url: \"http://vllm-3b-service:8000\"\n    type: \"vllm_openai\"\n    default_model: \"/models/qwen2.5-3b-awq\"\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"gateway-config","namespace":"ai-platform"}}
+    creationTimestamp: "2026-08-06T12:50:13Z"
+    name: gateway-config
+    namespace: ai-platform
+    resourceVersion: "41737"
+    uid: b95b76ab-8a12-4f03-960f-db20485c9616
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3ODU3Njk0MDAwHhcNMjYwODAzMTUwMzIwWhcNMzYwNzMxMTUwMzIw
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3ODU3Njk0MDAwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAQ9iQ03Ff0aA11/GR+qZPZSx3MX+eshgpQuYMDwAFw4
+      h1dfD8gKxkwBFB5dWCP+59sUPFl7W90ejFs/9xBFCt7Xo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUT/8YCP2roDIfKQikrBpt
+      vK3M+iQwCgYIKoZIzj0EAwIDRwAwRAIgUhzon/m503YyYCeSEbaKc10gufCrIrb5
+      nSiuYr4q2P0CIGu1bEF8wVV9ndqDr6tlnZGMMKRADNydlVD2Z88MQ4Ai
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-08-03T15:40:31Z"
+    name: kube-root-ca.crt
+    namespace: ai-platform
+    resourceVersion: "2594"
+    uid: 49a12942-9f36-4887-af34-2f18da20e79e
+- apiVersion: v1
+  data:
+    lmcache.yaml: |
+      chunk_size: 256
+      local_cpu: True
+      max_local_cpu_size: 1.0
+      local_disk: "/tmp/lmcache_disk"
+      max_local_disk_size: 10.0
+      use_gds: False
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"lmcache.yaml":"chunk_size: 256              # KV 缓存分块粒度 (tokens)\nlocal_cpu: True              # 启用 CPU 缓存层\nmax_local_cpu_size: 1.0      # CPU 缓存上限 (GB) — 8GB 机器留内存给进程\nlocal_disk: \"/tmp/lmcache_disk\"   # SSD 缓存目录\nmax_local_disk_size: 10.0    # SSD 缓存上限 (GB)\nuse_gds: False               # 禁用 GDS (WSL2 不支持 cufile)\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"lmcache-config","namespace":"ai-platform"}}
+    creationTimestamp: "2026-08-04T23:58:20Z"
+    name: lmcache-config
+    namespace: ai-platform
+    resourceVersion: "16034"
+    uid: 9111ddb7-f731-469f-afcd-0b0a7e806f29
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"ollama-models","namespace":"ai-platform"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.kubernetes.io/selected-node: k3d-ai-cluster-agent-1
+      volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+    creationTimestamp: "2026-08-03T15:54:07Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: ollama-models
+    namespace: ai-platform
+    resourceVersion: "3129"
+    uid: 085cfdfc-ce1a-4647-b9f0-288905f885e5
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: local-path
+    volumeMode: Filesystem
+    volumeName: pvc-085cfdfc-ce1a-4647-b9f0-288905f885e5
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 20Gi
+    phase: Bound
+kind: List
+metadata:
+  resourceVersion: ""

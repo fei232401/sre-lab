@@ -1,0 +1,27 @@
+NAMESPACE     NAME                                                                                                                           STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+ai-platform   persistentvolumeclaim/ollama-models                                                                                            Bound    pvc-085cfdfc-ce1a-4647-b9f0-288905f885e5   20Gi       RWO            local-path     <unset>                 43d
+monitoring    persistentvolumeclaim/prometheus-monitoring-kube-prometheus-prometheus-db-prometheus-monitoring-kube-prometheus-prometheus-0   Bound    pvc-82517cc7-afba-4166-a5e4-a2c747feb8d1   10Gi       RWO            local-path     <unset>                 43d
+
+NAMESPACE     NAME                                                         TYPE           CLUSTER-IP      EXTERNAL-IP                        PORT(S)                        AGE
+ai-platform   service/ai-infra-gateway                                     ClusterIP      10.43.77.79     <none>                             8000/TCP                       40d
+ai-platform   service/ollama-service                                       ClusterIP      10.43.64.134    <none>                             11434/TCP                      43d
+ai-platform   service/vllm-3b-service                                      ClusterIP      10.43.114.20    <none>                             8000/TCP                       41d
+default       service/kubernetes                                           ClusterIP      10.43.0.1       <none>                             443/TCP                        43d
+kube-system   service/kube-dns                                             ClusterIP      10.43.0.10      <none>                             53/UDP,53/TCP,9153/TCP         43d
+kube-system   service/metrics-server                                       ClusterIP      10.43.156.215   <none>                             443/TCP                        43d
+kube-system   service/monitoring-kube-prometheus-coredns                   ClusterIP      None            <none>                             9153/TCP                       43d
+kube-system   service/monitoring-kube-prometheus-kube-controller-manager   ClusterIP      None            <none>                             10257/TCP                      43d
+kube-system   service/monitoring-kube-prometheus-kube-etcd                 ClusterIP      None            <none>                             2381/TCP                       43d
+kube-system   service/monitoring-kube-prometheus-kube-proxy                ClusterIP      None            <none>                             10249/TCP                      43d
+kube-system   service/monitoring-kube-prometheus-kube-scheduler            ClusterIP      None            <none>                             10259/TCP                      43d
+kube-system   service/monitoring-kube-prometheus-kubelet                   ClusterIP      None            <none>                             10250/TCP,4194/TCP,10255/TCP   43d
+kube-system   service/traefik                                              LoadBalancer   10.43.50.0      172.18.0.3,172.18.0.4,172.18.0.5   80:31085/TCP,443:30555/TCP     43d
+monitoring    service/alertmanager-operated                                ClusterIP      None            <none>                             9093/TCP,9094/TCP,9094/UDP     43d
+monitoring    service/gpu-exporter                                         ClusterIP      10.43.225.168   <none>                             9400/TCP                       38d
+monitoring    service/monitoring-grafana                                   ClusterIP      10.43.111.122   <none>                             80/TCP                         43d
+monitoring    service/monitoring-kube-prometheus-alertmanager              ClusterIP      10.43.124.23    <none>                             9093/TCP,8080/TCP              43d
+monitoring    service/monitoring-kube-prometheus-operator                  ClusterIP      10.43.150.115   <none>                             443/TCP                        43d
+monitoring    service/monitoring-kube-prometheus-prometheus                ClusterIP      10.43.123.166   <none>                             9090/TCP,8080/TCP              43d
+monitoring    service/monitoring-kube-state-metrics                        ClusterIP      10.43.83.42     <none>                             8080/TCP                       43d
+monitoring    service/monitoring-prometheus-node-exporter                  ClusterIP      10.43.150.216   <none>                             9100/TCP                       43d
+monitoring    service/prometheus-operated                                  ClusterIP      None            <none>                             9090/TCP                       43d
