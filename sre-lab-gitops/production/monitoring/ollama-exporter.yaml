@@ -142,7 +142,7 @@ metadata:
     app: ollama-exporter
     app.kubernetes.io/name: ollama-exporter
     app.kubernetes.io/part-of: ai-platform
-    release: prometheus-stack
+    release: monitoring
 spec:
   replicas: 1
   selector:
@@ -154,7 +154,7 @@ spec:
         app: ollama-exporter
         app.kubernetes.io/name: ollama-exporter
         app.kubernetes.io/part-of: ai-platform
-        release: prometheus-stack
+        release: monitoring
       annotations:
         prometheus.io/scrape: "false"
     spec:
@@ -201,7 +201,7 @@ metadata:
   labels:
     app: ollama-exporter
     app.kubernetes.io/name: ollama-exporter
-    release: prometheus-stack
+    release: monitoring
 spec:
   type: ClusterIP
   ports:

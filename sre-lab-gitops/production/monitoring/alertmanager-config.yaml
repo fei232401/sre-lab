@@ -1,0 +1,35 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: sre-lab-alerting
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  route:
+    receiver: email
+    groupBy:
+      - namespace
+      - alertname
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 4h
+    routes:
+      - receiver: quiet
+        matchers:
+          - name: alertname
+            value: Watchdog
+            matchType: "="
+  receivers:
+    - name: email
+      emailConfigs:
+        - to: 599512147@qq.com
+          from: 599512147@qq.com
+          smarthost: smtp.qq.com:465
+          authUsername: 599512147@qq.com
+          authPassword:
+            name: alertmanager-smtp
+            key: password
+          forceImplicitTLS: true
+          sendResolved: true
+    - name: quiet

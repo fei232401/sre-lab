@@ -12,7 +12,7 @@ metadata:
   name: ollama-exporter-monitor
   namespace: ai-platform
   labels:
-    release: prometheus-stack
+    release: monitoring
     app.kubernetes.io/name: ollama-exporter
     app.kubernetes.io/part-of: ai-platform
 spec:
@@ -41,7 +41,7 @@ metadata:
   name: ollama-slo-rules
   namespace: ai-platform
   labels:
-    release: prometheus-stack
+    release: monitoring
     app.kubernetes.io/part-of: ai-platform
 spec:
   groups:
