@@ -1,6 +1,7 @@
 controller:
   nodeSelector:
     node-role: cpu
+  javaOpts: "-Dsun.net.inetaddr.ttl=30 -Dsun.net.inetaddr.negative.ttl=10"
   resources:
     requests:
       cpu: 200m
