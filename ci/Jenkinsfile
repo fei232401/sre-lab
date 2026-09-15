@@ -7,7 +7,14 @@ kind: Pod
 spec:
   nodeSelector:
     node-role: cpu
+  securityContext:
+    fsGroup: 1000
   containers:
+  - name: jnlp
+    volumeMounts:
+    - name: gitea-cred
+      mountPath: /home/jenkins/gitea-cred
+      readOnly: true
   - name: buildah
     image: quay.io/buildah/stable:v1.37.0
     command: ["sleep"]
@@ -46,32 +53,16 @@ spec:
       limits:
         cpu: 500m
         memory: 256Mi
-  - name: git
-    image: alpine/git:latest
-    command: ["sleep"]
-    args: ["infinity"]
-    volumeMounts:
-    - name: gitea-netrc
-      mountPath: /root/.netrc
-      subPath: netrc
-      readOnly: true
-    resources:
-      requests:
-        cpu: 50m
-        memory: 64Mi
-      limits:
-        cpu: 500m
-        memory: 256Mi
   volumes:
   - name: registries-conf
     configMap:
       name: buildah-registries
   - name: containers-storage
     emptyDir: {}
-  - name: gitea-netrc
+  - name: gitea-cred
     secret:
       secretName: gitea-netrc
-      defaultMode: 0400
+      defaultMode: 0440
 '''
     }
   }
@@ -93,9 +84,7 @@ spec:
   stages {
     stage('Checkout') {
       steps {
-        container('git') {
-          checkout scm
-        }
+        checkout scm
       }
     }
 
@@ -165,40 +154,39 @@ spec:
 
     stage('Update GitOps') {
       steps {
-        container('git') {
-          sh '''
-            set -e
-            git config user.email "jenkins@sre-lab-ci"
-            git config user.name  "Jenkins CI"
+        sh '''
+          set -e
+          install -m 600 /home/jenkins/gitea-cred/netrc $HOME/.netrc
+          git config user.email "jenkins@sre-lab-ci"
+          git config user.name  "Jenkins CI"
 
-            OLD_IMAGE=$(grep -oP "(?<=image: )${REGISTRY}/${IMAGE_NAME}:\\S+" ${GITOPS_FILE} || echo "none")
-            echo "旧镜像: ${OLD_IMAGE}"
-            echo "新镜像: ${IMAGE_REF}"
+          OLD_IMAGE=$(grep -oP "(?<=image: )${REGISTRY}/${IMAGE_NAME}:\\S+" ${GITOPS_FILE} || echo "none")
+          echo "旧镜像: ${OLD_IMAGE}"
+          echo "新镜像: ${IMAGE_REF}"
 
-            sed -i "s|image: ${REGISTRY}/${IMAGE_NAME}:.*|image: ${IMAGE_REF}|" ${GITOPS_FILE}
+          sed -i "s|image: ${REGISTRY}/${IMAGE_NAME}:.*|image: ${IMAGE_REF}|" ${GITOPS_FILE}
 
-            if git diff --quiet -- ${GITOPS_FILE}; then
-              echo "镜像 tag 未变化，跳过提交"
+          if git diff --quiet -- ${GITOPS_FILE}; then
+            echo "镜像 tag 未变化,跳过提交"
+            exit 0
+          fi
+
+          git add ${GITOPS_FILE}
+          git commit -m "ci: bump ollama-exporter to ${SHORT_SHA}"
+
+          for i in 1 2 3; do
+            if git push ${GIT_REPO} HEAD:main; then
+              echo "GitOps 已写回(第 ${i} 次尝试)"
               exit 0
             fi
-
-            git add ${GITOPS_FILE}
-            git commit -m "ci: bump ollama-exporter to ${SHORT_SHA}"
-
-            for i in 1 2 3; do
-              if git push ${GIT_REPO} HEAD:main; then
-                echo "GitOps 已写回(第 ${i} 次尝试)"
-                exit 0
-              fi
-              echo "推送被拒,拉取远端后重放本地提交(第 ${i} 次)"
-              git fetch ${GIT_REPO} main
-              git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
-              sleep 2
-            done
-            echo "三次写回均失败"
-            exit 1
-          '''
-        }
+            echo "推送被拒,拉取远端后重放本地提交(第 ${i} 次)"
+            git fetch ${GIT_REPO} main
+            git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
+            sleep 2
+          done
+          echo "三次写回均失败"
+          exit 1
+        '''
       }
     }
 
@@ -209,7 +197,7 @@ spec:
       echo "流水线成功: ${env.IMAGE_REF}"
     }
     failure {
-      echo "流水线失败，检查各 stage 日志"
+      echo "流水线失败,检查各 stage 日志"
     }
   }
 }
