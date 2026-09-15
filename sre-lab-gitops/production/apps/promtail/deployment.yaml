@@ -147,9 +147,6 @@ spec:
             - name: pods-logs
               mountPath: /var/log/pods
               readOnly: true
-            - name: docker-logs
-              mountPath: /var/lib/docker/containers
-              readOnly: true
       volumes:
         - name: config
           configMap:
@@ -157,6 +154,3 @@ spec:
         - name: pods-logs
           hostPath:
             path: /var/log/pods
-        - name: docker-logs
-          hostPath:
-            path: /var/lib/docker/containers
