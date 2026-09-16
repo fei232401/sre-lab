@@ -238,6 +238,38 @@ Jenkins Pod → http://monitoring-kube-prometheus-alertmanager.monitoring.svc:90
 
 > 告警的 `labels` 里**刻意不放 build 号和版本号**(它们放 `annotations`)。原因见 P27:labels 是告警的**身份**,往里塞易变值会让告警**永远关不掉**。
 
+### 怎么证明「失败通知真的到人」(四步法)
+
+这套链路有三个**静默失效点**(sealed-secrets 私钥、SMTP 授权码、路由匹配),而且**每一处坏掉的表现都是"什么都不发生"**。所以要**主动去证**,不能等它自己暴露。
+
+**判据按可靠性排序,别用日志当第一判据(原因见 P28)。**
+
+```bash
+NS=monitoring
+AM=http://monitoring-kube-prometheus-alertmanager.monitoring.svc:9093
+
+# ① 告警进没进 Alertmanager?（filter 要 URL 编码引号）
+curl -s "$AM/api/v2/alerts?filter=alertname%3D%22JenkinsPipelineFailed%22"
+
+# ② 它被路由到了哪个 receiver?—— 看告警对象自己的 receivers 字段
+#    期望: [{"name":"monitoring/sre-lab-alerting/email"}]
+
+# ③ 通知真的发出去了吗?—— 用计数器,不用日志
+curl -s "$AM/metrics" | grep -E 'alertmanager_notifications_(total|failed_total)\{.*integration="email"'
+#    判据: notifications_total - failed_total 的增量 > 0
+
+# ④ 配置是不是我以为的那份?（prometheus-operator 存的是 .gz,要 gunzip）
+kubectl --context k3d-ai-cluster -n $NS get secret \
+  alertmanager-monitoring-kube-prometheus-alertmanager-generated \
+  -o jsonpath='{.data.alertmanager\.yaml\.gz}' | base64 -d | gunzip
+```
+
+> ⏱️ **观测窗口必须 > `group_interval`(本仓库配的是 `5m`)。** 刚投完告警的 30~60 秒内读计数器,**大概率还是 0**,那是正常的,不是故障(P29)。
+>
+> ✅ 本仓库 2026-09-17 实测:`notifications_total|email = 8`、`failed_total|email = 0`(Alertmanager 进程 71 分钟内)。同时告警状态能正确地在 `active → 消失` 之间往返,说明 `send_resolved` 也配得上对(P27)。
+
+**还有个更彻底的证法(未做)**:让一次构建**真的失败**一次,看 failure 分支是否真的把告警打进来。本仓库的三次构建(#23/#24/#25)**全都成功**,所以 `post{failure}` 这条分支**至今没被真实触发过一次**——它和 `post{success}` 共用同一段投递代码,但**"共用代码"是推演,不是实测**。记在这里,当作已知的验证缺口。
+
 ### 控制面已可从 Git 重建
 
 任务定义活体导出在 `ci/job-config.xml`(触发令牌已脱敏),完整重建顺序见 `08_重建/CI_重建清单.md`。
@@ -292,3 +324,4 @@ curl -s -b "$COOKIE_JAR" \
 | 日期 | 变更 |
 |---|---|
 | 2026-09-16 | 建立。收录访问入口、两个 REST API 坑(crumb 会话绑定 / `json=` form 编码)、重启代价纪律、流水线任务信息、本地镜像仓库命令 |
+| 2026-09-17 | 补「怎么证明失败通知真的到人」四步法(precondition: 观测窗口 > group_interval)。对应踩坑 P28–P31、决策 D22 |
