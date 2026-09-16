@@ -1,5 +1,6 @@
 import http.server
 import json
+import os
 import time
 import urllib.request
 import urllib.error
@@ -11,6 +12,7 @@ logger = logging.getLogger('ollama-exporter')
 
 OLLAMA_URL = "http://ollama-service:11434"
 SCRAPE_INTERVAL = 30  # seconds
+BUILD_REVISION = os.environ.get("GIT_SHA", "unknown")
 
 # 全局指标存储
 metrics = {
@@ -96,6 +98,10 @@ class MetricsHandler(http.server.BaseHTTPRequestHandler):
         lines.append("# TYPE ollama_model_info gauge")
         for m in metrics.get("ollama_models_list", []):
             lines.append(f'ollama_model_info{{model="{m["name"]}",digest="{m["digest"]}"}} {m["size"]}')
+        lines.append("")
+        lines.append("# HELP sre_lab_build_info 构建版本信息 (1=当前运行版本)")
+        lines.append("# TYPE sre_lab_build_info gauge")
+        lines.append(f'sre_lab_build_info{{revision="{BUILD_REVISION}"}} 1')
         lines.append("")
         lines.append("# HELP ollama_scrape_errors_total Exporter 采集错误总数")
         lines.append("# TYPE ollama_scrape_errors_total counter")

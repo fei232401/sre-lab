@@ -117,6 +117,7 @@ spec:
               --storage-driver=vfs \
               --isolation=chroot \
               --format=docker \
+              --build-arg GIT_SHA=${SHORT_SHA} \
               -t ${IMAGE_REF} \
               -f ${DOCKERFILE} \
               ${BUILD_CTX}
