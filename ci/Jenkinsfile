@@ -88,7 +88,35 @@ spec:
       }
     }
 
+    stage('Trigger Guard') {
+      steps {
+        script {
+          env.SHOULD_BUILD = 'true'
+          def changed = sh(script: '''
+            if git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+              git diff --name-only HEAD~1 HEAD
+            else
+              echo __UNKNOWN__
+            fi
+          ''', returnStdout: true).trim()
+          echo "本次推送涉及的文件: ${changed}"
+          if (changed == '__UNKNOWN__') {
+            echo "无法比对上一提交,保守起见照常构建"
+          } else {
+            def relevant = changed.readLines().any { p -> p.startsWith('ci/') || p.startsWith('03-ollama-exporter/') }
+            if (relevant) {
+              echo "命中构建路径,继续流水线"
+            } else {
+              env.SHOULD_BUILD = 'false'
+              echo "本次推送未触及 ci/ 或 03-ollama-exporter/,跳过构建(阻断 CI 写回配置仓造成的自激循环)"
+            }
+          }
+        }
+      }
+    }
+
     stage('Resolve Tag') {
+      when { expression { env.SHOULD_BUILD == 'true' } }
       steps {
         script {
           env.SHORT_SHA = sh(script: 'git rev-parse --short=7 HEAD', returnStdout: true).trim()
@@ -99,6 +127,7 @@ spec:
     }
 
     stage('Lint') {
+      when { expression { env.SHOULD_BUILD == 'true' } }
       steps {
         container('lint') {
           sh '''
@@ -110,6 +139,7 @@ spec:
     }
 
     stage('Build') {
+      when { expression { env.SHOULD_BUILD == 'true' } }
       steps {
         container('buildah') {
           sh '''
@@ -128,6 +158,7 @@ spec:
     }
 
     stage('Push') {
+      when { expression { env.SHOULD_BUILD == 'true' } }
       steps {
         container('buildah') {
           sh '''
@@ -142,6 +173,7 @@ spec:
     }
 
     stage('Verify In Registry') {
+      when { expression { env.SHOULD_BUILD == 'true' } }
       steps {
         container('buildah') {
           sh '''
@@ -154,6 +186,7 @@ spec:
     }
 
     stage('Update GitOps') {
+      when { expression { env.SHOULD_BUILD == 'true' } }
       steps {
         sh '''
           set -e
