@@ -118,9 +118,10 @@ spec:
             base = 'HEAD~1'
             echo "webhook 未提供可比对的起点,退回只看最后一个提交"
           }
+          def GIT = 'git -c core.quotePath=false'
           def changed = sh(script: """
-            if git rev-parse --verify ${base} >/dev/null 2>&1; then
-              git diff --name-only ${base} HEAD
+            if ${GIT} rev-parse --verify ${base} >/dev/null 2>&1; then
+              ${GIT} diff --name-only ${base} HEAD
             else
               echo __UNKNOWN__
             fi
