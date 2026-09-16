@@ -28,6 +28,20 @@ kubectl --context k3d-ai-cluster ...      # 本项目所有命令都带这个
 
 ## 二、访问入口
 
+**首选 NodePort(稳定)**:
+
+```
+http://172.18.0.5:30080
+```
+
+`172.18.0.5` 是 **k3d server 节点容器的 IP**,`30080` 是 `jenkins-values.yaml` 里配的 `nodePort`。
+
+> **为什么不用 port-forward**:`kubectl port-forward` 是**本机进程**,进程一断链接就死。实测在长时间脚本里会莫名其妙地"命令还在跑但请求全部失败",而且失败形态**不是连接拒绝,是返回非预期内容**(比如 HTML 而不是 JSON)——很容易被误读成"接口变了"。集群内(Gitea 容器)和宿主机都能走 NodePort,就用它。
+>
+> 顺带一个坑:清理 port-forward 时写 `pkill -f "port-forward svc/jenkins"` **会匹配到自己这条命令**,把当前 shell 一起杀掉(退出码 144)。要杀就按 PID 杀。
+
+**备选(仅本机浏览器临时看 UI)**:
+
 ```bash
 kubectl --context k3d-ai-cluster port-forward -n jenkins svc/jenkins 18081:8080
 ```
@@ -101,6 +115,24 @@ curl -s -b "$COOKIE_JAR" \
 
 > `400 Nothing is submitted` 这个报错很有迷惑性 —— 它容易被读成"请求体是空的",而实际请求体**是满的**,只是**放错了位置**(body 里,而不是 `json` 这个 form 字段里)。**报错信息描述的是服务端看到了什么,不是你发了什么。**
 
+### ⚠️ 坑 3:远程触发令牌(`/build?token=X`)**被 CSRF 保护挡死**
+
+Jenkins 2.568.3 上,即便给任务配好了 `BuildAuthorizationToken`,这几种写法**全部 403**:
+
+```
+GET  /job/sre-lab-ci/build?token=<TOKEN>
+POST /job/sre-lab-ci/build?token=<TOKEN>
+POST /job/sre-lab-ci/build?token=<TOKEN>  (+ 管理员账号密码)
+```
+
+报错统一是 `No valid crumb was included` —— **令牌是对的,是被 CSRF 拦在更外层**。
+
+> **根因**:本环境 JCasC 里 `allowAnonymousRead: false`,令牌这条路要求请求"够得着"任务,而 CSRF 又要求每个请求带会话绑定的 crumb。**凭证令牌和 CSRF 是两层独立机制**,配好了前者不代表能过后者。
+
+**绕过方式就是 webhook 插件**:`generic-webhook-trigger` 提供自己的端点 `/generic-webhook-trigger/invoke?token=...`,它**不受这条 CSRF 约束**,并且支持把令牌放进 Jenkins **凭据**里(`tokenCredentialId`),**令牌值因此不需要写进任何仓库文件**。
+
+> 配一个 `BuildAuthorizationToken` 还费了点劲:它**不是** `JobProperty`,`addProperty()` 用不了;反射时若把值设成 `String` 会抛 `IllegalArgumentException: Can not set ... BuildAuthorizationToken field ... to java.lang.String`。最后是**反射直接 set 成 `new BuildAuthorizationToken(TOKEN)`** 才成功。**这段折腾的结论是:此路不通,换插件**——记录下来免得下次再走一遍。
+
 ### 附:这条路没走通的部分
 
 > 用 REST API 创建 `GitSSHUserPrivateKey` 类型凭据时,**返回 500**,没能成功。时间原因改用"把私钥以 K8s Secret 挂进构建 Pod"的方案。
@@ -125,20 +157,20 @@ curl -s -b "$COOKIE_JAR" \
 
 出问题的时候重启,你付出的代价是"分钟级不可用"叠加在"系统已经不正常"之上 —— 而这两件事在时间上会**混在一起**,让归因变难。
 
-### 已经欠下的一笔:JVM DNS 缓存参数
-
-`jenkins-values.yaml` 的 `controller.javaOpts` 需要加:
+### ✅ 已还:JVM DNS 缓存参数(2026-09-16)
 
 ```yaml
 controller:
-  javaOpts: >
-    -Dsun.net.inetaddr.ttl=30
-    -Dsun.net.inetaddr.negative.ttl=10
+  javaOpts: "-Dsun.net.inetaddr.ttl=30 -Dsun.net.inetaddr.negative.ttl=10"
 ```
+
+已随 `jenkins-values.yaml` 一起 `helm upgrade` 落地(rev 3,状态 `deployed`)。
 
 **原因与完整故事见 `06_踩坑记录.md` 的 P15** —— Jenkins 是 JVM,默认缓存 DNS 解析结果,不改这两个参数的话,DNS 变更后它**必须靠重启才能感知**。
 
-> **这两个参数正是"需要重启才生效的事"的典型例子。** 按上面的纪律,应该尽早应用,而不是等下一次 DNS 问题发生时才后悔。
+> **这笔债的偿还过程本身又是一课**:`helm upgrade --wait` 会**超时失败**,因为 init 容器在重下插件(`Ready: 0/1`)。**但它其实没坏**——等下载完,把同一条 upgrade 再跑一遍就 `deployed` 了。
+>
+> **教训:`--wait` 超时 ≠ 变更失败。** 先看 Pod 到底卡在哪一步,再决定是回滚还是重跑。
 
 ---
 
@@ -148,14 +180,22 @@ controller:
 |---|---|
 | 任务名 | `sre-lab-ci` |
 | Jenkinsfile | 仓库内 `ci/Jenkinsfile` |
-| SCM polling | `H/2 * * * *` |
+| 触发方式 | **Gitea webhook 推送**(2026-09-16 起;原来的 SCM 轮询已废弃) |
 | 构建 Pod 落点 | `node-role: cpu` 的节点 |
 
-### SCM polling
+### 触发方式:webhook(已取代 SCM 轮询)
 
-`H/2 * * * *` —— **每 2 小时轮询一次仓库**。
+**SCM 轮询在这套架构下根本不可能工作**,已彻底移除。完整诊断见 `06_踩坑记录.md` 的 P18,一句话版本:
 
-> 这与 ArgoCD 的轮询是**两条独立的**发现路径:Jenkins 轮询的是"**代码有没有变**"(变了就触发构建),ArgoCD 轮询的是"**GitOps 仓库有没有变**"(变了就同步到集群)。两套轮询各管各的,不要互相假设。
+> 轮询要算"这次推送改了哪些路径",这需要**上一次构建的工作区**。而我们的构建 agent 是**即用即销的 k8s Pod**——轮询执行的那一刻那个节点**必然已经不存在**。于是它降级成"无变更"直接返回,并且**不报错、不告警**。
+>
+> 决定性证据:轮询日志里 `Done. Took 0 ms` / `No changes`。**0 毫秒干不完一次网络往返,说明它压根没去问。**
+
+现在由 Gitea 的 push webhook 经 `generic-webhook-trigger` 插件触发。配置与令牌管理见 `04_发布与回滚手册.md` 第五节。
+
+> **顺带纠正一个我(手册)自己写错的地方**:`H/2 * * * *` 在 5 段式 cron 里是**每 2 分钟**,不是每 2 小时。当时看着"2"就顺手写成了小时,没验证。**这类"看起来对所以没查"的陈述,是文档里最危险的一类错误。**
+
+> 这与 ArgoCD 的轮询仍是**两条独立的**发现路径:Jenkins 管"**代码有没有变**"(变了就构建),ArgoCD 管"**GitOps 仓库有没有变**"(变了就同步)。两者各管各的,不要互相假设。
 
 ### 构建 Pod 落在 CPU 节点
 

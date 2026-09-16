@@ -9,13 +9,15 @@ controller:
     limits:
       cpu: 1500m
       memory: 1536Mi
-  serviceType: ClusterIP
+  serviceType: NodePort
+  nodePort: 30080
   installPlugins:
     - kubernetes
     - workflow-aggregator
     - git
     - configuration-as-code
     - credentials-binding
+    - generic-webhook-trigger
   overwritePlugins: false
   JCasC:
     defaultConfig: true

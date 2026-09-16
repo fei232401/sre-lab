@@ -67,6 +67,21 @@ spec:
     }
   }
 
+  triggers {
+    GenericTrigger(
+      genericVariables: [
+        [key: 'GIT_REF',      value: '$.ref'],
+        [key: 'GIT_AFTER',    value: '$.after'],
+        [key: 'GIT_REPO_URL', value: '$.repository.clone_url'],
+        [key: 'GIT_PUSHER',   value: '$.pusher.username']
+      ],
+      tokenCredentialId: 'gitea-webhook-token',
+      causeString: 'Gitea push $GIT_REF ($GIT_AFTER) by $GIT_PUSHER',
+      printContributedVariables: true,
+      printPostContent: true
+    )
+  }
+
   options {
     disableConcurrentBuilds()
   }
