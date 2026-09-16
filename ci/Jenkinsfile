@@ -71,6 +71,7 @@ spec:
     GenericTrigger(
       genericVariables: [
         [key: 'GIT_REF',      value: '$.ref'],
+        [key: 'GIT_BEFORE',   value: '$.before'],
         [key: 'GIT_AFTER',    value: '$.after'],
         [key: 'GIT_REPO_URL', value: '$.repository.clone_url'],
         [key: 'GIT_PUSHER',   value: '$.pusher.username']
@@ -107,16 +108,26 @@ spec:
       steps {
         script {
           env.SHOULD_BUILD = 'true'
-          def changed = sh(script: '''
-            if git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
-              git diff --name-only HEAD~1 HEAD
+          def before = (env.GIT_BEFORE ?: '').trim()
+          def zero   = '0' * 40
+          def base   = ''
+          if (before && before != zero && sh(script: "git cat-file -e ${before}^{commit} && echo ok || echo no", returnStdout: true).trim() == 'ok') {
+            base = before
+            echo "本次推送范围: ${before.substring(0,7)}..${(env.GIT_AFTER ?: 'HEAD').take(7)}(由 webhook 提供)"
+          } else {
+            base = 'HEAD~1'
+            echo "webhook 未提供可比对的起点,退回只看最后一个提交"
+          }
+          def changed = sh(script: """
+            if git rev-parse --verify ${base} >/dev/null 2>&1; then
+              git diff --name-only ${base} HEAD
             else
               echo __UNKNOWN__
             fi
-          ''', returnStdout: true).trim()
+          """, returnStdout: true).trim()
           echo "本次推送涉及的文件: ${changed}"
           if (changed == '__UNKNOWN__') {
-            echo "无法比对上一提交,保守起见照常构建"
+            echo "无法比对,保守起见照常构建"
           } else {
             def relevant = changed.readLines().any { p -> p.startsWith('ci/') || p.startsWith('03-ollama-exporter/') }
             if (relevant) {
