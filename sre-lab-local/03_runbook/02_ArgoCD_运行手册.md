@@ -139,37 +139,37 @@ kubectl --context k3d-ai-cluster -n argocd annotate application <app> \
 
 ---
 
-## 四、`monitoring-app` 的 apply 顺序(⚠️ 有硬约束)
+## 四、`monitoring-app` 的 apply 顺序(⚠️ 曾有硬约束,**现已解除**)
 
-`production/monitoring/` 目录当前包含 **`wechat-adapter.yaml`**,而那份文件里的 PushPlus token 是**明文**(见 D8 / D11)。
+> 📌 **回填(2026-09-16 晚):本节描述的是一道曾经存在的窗口,现在窗口已经正常关闭。**
+> 保留原文结构与教训,但**结论已更新**——按旧结论操作会与现实对不上。
 
-**`monitoring-app` 一旦 apply,ArgoCD 会立刻把这个 Deployment 部署进集群。**
+**曾经的问题**:`production/monitoring/` 目录里有过一份 `wechat-adapter.yaml`,把 PushPlus token **明文硬编码在清单里**(见 D8 / D11)。清单是要进 Git 的,而 `monitoring-app` 一旦 apply,ArgoCD 会立刻把它部署进集群——**等于把明文凭证连人带文件一起推进生产**。
 
-所以顺序是硬性的:
+所以当时定下的顺序是硬性的:
 
 ```
-1. ✅ 先重写/删除 wechat-adapter.yaml(D12 的适配器替换)
-2. ✅ 确认目录里再没有任何明文凭证
+1. 先重写/删除 wechat-adapter.yaml(D12 的适配器替换)
+2. 确认目录里再没有任何明文凭证
 3. 再 apply monitoring-app.yaml
 ```
 
-**验证方法**(apply 之前跑):
+**验证方法**(每次动 `monitoring-app` 之前都值得跑一遍):
 
 ```bash
-grep -rn "28eae0\|pushplus\|PUSHPLUS_TOKEN" sre-lab-gitops/production/monitoring/
+grep -rniE "pushplus|PUSHPLUS_TOKEN|[0-9a-f]{32}" sre-lab-gitops/production/monitoring/
 ```
 
 **目标状态是无输出。有输出就不要 apply。**
 
-> ⚠️ **当前(2026-09-16)实跑结果是有输出** —— 也就是危险仍然存在:
+> ✅ **当前(2026-09-16 晚)实跑结果:无输出。**
 >
-> ```
-> sre-lab-gitops/production/monitoring/wechat-adapter.yaml:47:
->   PUSHPLUS_TOKEN = "28eae010..."
-> ```
+> 该文件已删除,告警通道改为企业微信机器人 + `SealedSecret`(`sealed-alertmanager-smtp.yaml`)。
+> `monitoring-app` 已于更早时候 apply,当前 **Synced / Healthy**,与 `sealed-secrets` 等共 6 个 Application 并存。
 >
-> **好消息:`monitoring-app` 尚未 apply**(集群里只有 `sealed-secrets` 一个 Application),
-> **所以这个顺序窗口还开着。** 必须赶在 apply 之前完成第 1、2 步。
+> **也就是说:第 1、2 步在 apply 之前完成了,这道约束没有被违反。** 本节由"待办"降级为"回归检查项"。
+
+> ⚠️ **残留风险(如实记)**:那串 token 的**完整值仍在 git 历史里**(提交 `266b65a` / `3db3984b` 的 blob),且已随 `origin`(GitHub 公开镜像)推走;D11 决定**不吊销**该凭证,理由是项目已不再使用 PushPlus。也就是说:**它是"不再使用",不是"已失效"。** 谁拿到它,就还能往那个 PushPlus 账号的订阅者推消息。风险低但非零,决定已记录在案,此处只做如实标注。
 
 ---
 
