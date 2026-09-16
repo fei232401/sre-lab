@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+- **构建版本自证指标** — exporter 暴露 `sre_lab_build_info{revision}` ,绕开「Pod 上的 tag 字符串」,由运行时行为直接证明部署的是哪个版本
+- **发布回滚演练记录** — 声明式发布 → 收敛 → `git revert` 回滚 → 收敛,双向行为级证据
+
+### Fixed
+- **CI 自激循环** — 流水线写回配置仓会触发轮询再次构建,形成无限循环
+- **CI 静默不触发** — 路径过滤放在触发层时依赖上一次构建的工作区,agent 即用即销导致轮询每次 1ms 返回 no-changes 且不报错
+
+### Changed
+- **路径过滤下沉** — 从 Jenkins 轮询配置(`PathRestriction`)移到流水线内 `Trigger Guard` stage,在能计算 diff 的地方判定
+
 ## [2.0.0] — 2026-06-21
 
 ### Added
