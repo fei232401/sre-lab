@@ -180,7 +180,7 @@ controller:
 |---|---|
 | 任务名 | `sre-lab-ci` |
 | Jenkinsfile | 仓库内 `ci/Jenkinsfile` |
-| 触发方式 | **Gitea webhook 推送**(2026-09-16 起;原来的 SCM 轮询已废弃) |
+| 触发方式 | **Gitea webhook 推送**(2026-09-16 起;SCM 轮询已从任务配置中**删除**) |
 | 构建 Pod 落点 | `node-role: cpu` 的节点 |
 
 ### 触发方式:webhook(已取代 SCM 轮询)
@@ -191,7 +191,11 @@ controller:
 >
 > 决定性证据:轮询日志里 `Done. Took 0 ms` / `No changes`。**0 毫秒干不完一次网络往返,说明它压根没去问。**
 
-现在由 Gitea 的 push webhook 经 `generic-webhook-trigger` 插件触发。配置与令牌管理见 `04_发布与回滚手册.md` 第五节。
+现在由 Gitea 的 push webhook 经 `generic-webhook-trigger` 插件触发。配置、令牌管理、以及**三个"少一个就静默不工作"的前置条件**见 `04_发布与回滚手册.md` 第五节。
+
+> ⚠️ **注意一处容易看漏的地方**:`triggers` 指令写在 Jenkinsfile 里,但它的注册要**先跑一次构建**(Jenkins 要解析过 Jenkinsfile 才知道有这回事)。所以**第一次接入时必须先手动跑一次**,之后才吃 webhook。手动那次的触发原因是 `Started by user ...`——**看到这个就说明你验的不是链路。**
+
+> 另外,任务配置里的**老 `SCMTrigger` 不会因为 Jenkinsfile 没声明它而自动消失**(实测:它和新的 `GenericTrigger` 并存,导致每次 push 构建两次)。要**显式从 `config.xml` 里摘掉**。删触发器用的 POST 同样要注意 P21 的 `charset=UTF-8`。
 
 > **顺带纠正一个我(手册)自己写错的地方**:`H/2 * * * *` 在 5 段式 cron 里是**每 2 分钟**,不是每 2 小时。当时看着"2"就顺手写成了小时,没验证。**这类"看起来对所以没查"的陈述,是文档里最危险的一类错误。**
 

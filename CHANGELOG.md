@@ -15,10 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **CI 自激循环** — 流水线写回配置仓会触发轮询再次构建,形成无限循环
-- **CI 静默不触发** — 路径过滤放在触发层时依赖上一次构建的工作区,agent 即用即销导致轮询每次 1ms 返回 no-changes 且不报错
+- **CI 静默不触发** — 路径过滤放在触发层时依赖上一次构建的工作区;临时 agent 已销毁,导致轮询每次返回 no-changes 且不报错
+- **Gitea webhook 投递被 SSRF 防护拒绝** — 默认只允许发往公网,私网目标静默失败(仅 Gitea 日志可见);`app.ini` 放行本网段
+- **SCM 轮询触发器残留** — Jenkinsfile 未声明它也不会自动移除,与新触发器并存导致每次 push 构建两次;显式从任务配置中删除
 
 ### Changed
 - **路径过滤下沉** — 从 Jenkins 轮询配置(`PathRestriction`)移到流水线内 `Trigger Guard` stage,在能计算 diff 的地方判定
+- **触发方式改为 webhook** — 推送模型提供 `before`/`after` 两个 revision,`Trigger Guard` 因此能判定**整次推送**的变更范围,取代原来只看最后一次提交的简化
 
 ## [2.0.0] — 2026-06-21
 
