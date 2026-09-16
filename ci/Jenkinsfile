@@ -58,7 +58,8 @@ spec:
     configMap:
       name: buildah-registries
   - name: containers-storage
-    emptyDir: {}
+    persistentVolumeClaim:
+      claimName: buildah-storage
   - name: gitea-cred
     secret:
       secretName: gitea-netrc
@@ -78,8 +79,8 @@ spec:
       ],
       tokenCredentialId: 'gitea-webhook-token',
       causeString: 'Gitea push $GIT_REF ($GIT_AFTER) by $GIT_PUSHER',
-      printContributedVariables: true,
-      printPostContent: true
+      printContributedVariables: false,
+      printPostContent: false
     )
   }
 
@@ -153,13 +154,13 @@ spec:
       }
     }
 
-    stage('Lint') {
+    stage('Test') {
       when { expression { env.SHOULD_BUILD == 'true' } }
       steps {
         container('lint') {
           sh '''
-            python -m py_compile ${BUILD_CTX}/exporter.py
-            echo "exporter.py 语法检查通过"
+            python -m unittest discover -s ${BUILD_CTX} -p 'test_*.py' -v
+            echo "单元测试全部通过"
           '''
         }
       }
@@ -255,10 +256,16 @@ spec:
 
   post {
     success {
-      echo "流水线成功: ${env.IMAGE_REF}"
+      echo "流水线成功: ${env.IMAGE_REF ?: '本次推送未触及构建路径,已跳过构建'}"
+      container('lint') {
+        sh 'python ci/notify_alertmanager.py resolve || true'
+      }
     }
     failure {
       echo "流水线失败,检查各 stage 日志"
+      container('lint') {
+        sh 'python ci/notify_alertmanager.py fire || true'
+      }
     }
   }
 }

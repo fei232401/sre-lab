@@ -24,43 +24,45 @@ metrics = {
     "ollama_scrape_errors_total": 0,
 }
 
+def scrape_once():
+    try:
+        start = time.time()
+        # 1. 健康检查: GET /
+        req = urllib.request.Request(f"{OLLAMA_URL}/", method="GET")
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            body = resp.read().decode()
+            metrics["ollama_up"] = 1 if "Ollama is running" in body else 0
+
+        # 2. 获取已加载模型: GET /api/tags
+        req2 = urllib.request.Request(f"{OLLAMA_URL}/api/tags", method="GET")
+        with urllib.request.urlopen(req2, timeout=15) as resp2:
+            data = json.loads(resp2.read().decode())
+            model_list = data.get("models", [])
+            metrics["ollama_models_loaded"] = len(model_list)
+            metrics["ollama_models_list"] = [
+                {"name": m.get("name", "unknown"),
+                 "size": m.get("size", 0),
+                 "digest": m.get("digest", "")[:16]}
+                for m in model_list
+            ]
+
+        latency = time.time() - start
+        metrics["ollama_api_response_time_seconds"] = round(latency, 4)
+
+    except urllib.error.URLError as e:
+        metrics["ollama_up"] = 0
+        metrics["ollama_api_response_time_seconds"] = 0
+        metrics["ollama_scrape_errors_total"] += 1
+        logger.warning(f"Ollama API 不可达: {e}")
+    except Exception as e:
+        metrics["ollama_scrape_errors_total"] += 1
+        logger.error(f"采集异常: {e}")
+
+
 def collect_metrics():
     """定期从 Ollama API 采集指标"""
-    global metrics
     while True:
-        try:
-            start = time.time()
-            # 1. 健康检查: GET /
-            req = urllib.request.Request(f"{OLLAMA_URL}/", method="GET")
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                body = resp.read().decode()
-                metrics["ollama_up"] = 1 if "Ollama is running" in body else 0
-
-            # 2. 获取已加载模型: GET /api/tags
-            req2 = urllib.request.Request(f"{OLLAMA_URL}/api/tags", method="GET")
-            with urllib.request.urlopen(req2, timeout=15) as resp2:
-                data = json.loads(resp2.read().decode())
-                model_list = data.get("models", [])
-                metrics["ollama_models_loaded"] = len(model_list)
-                metrics["ollama_models_list"] = [
-                    {"name": m.get("name", "unknown"),
-                     "size": m.get("size", 0),
-                     "digest": m.get("digest", "")[:16]}
-                    for m in model_list
-                ]
-
-            latency = time.time() - start
-            metrics["ollama_api_response_time_seconds"] = round(latency, 4)
-
-        except urllib.error.URLError as e:
-            metrics["ollama_up"] = 0
-            metrics["ollama_api_response_time_seconds"] = 0
-            metrics["ollama_scrape_errors_total"] += 1
-            logger.warning(f"Ollama API 不可达: {e}")
-        except Exception as e:
-            metrics["ollama_scrape_errors_total"] += 1
-            logger.error(f"采集异常: {e}")
-
+        scrape_once()
         time.sleep(SCRAPE_INTERVAL)
 
 class MetricsHandler(http.server.BaseHTTPRequestHandler):

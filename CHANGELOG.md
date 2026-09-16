@@ -23,6 +23,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **路径过滤下沉** — 从 Jenkins 轮询配置(`PathRestriction`)移到流水线内 `Trigger Guard` stage,在能计算 diff 的地方判定
 - **触发方式改为 webhook** — 推送模型提供 `before`/`after` 两个 revision,`Trigger Guard` 因此能判定**整次推送**的变更范围,取代原来只看最后一次提交的简化
 
+### 2026-09-17 — 控制面加固(P0 五项 + 架构层修正)
+
+- **新增** `03-ollama-exporter/test_exporter.py` — 14 个单元用例(标准库 `unittest`,零依赖零网络),取代原来只做 `py_compile` 的 `Lint` stage
+- **新增** `ci/notify_alertmanager.py` — 构建失败投递 Alertmanager 告警(触发邮件),恢复时投递同标签的已解决告警
+- **新增** `08_重建/CI_重建清单.md` + `08_重建/manifests/` — 控制面「全部可从 Git 重建」的清单与对象定义
+- **新增** `ci/job-config.xml` — 活体导出的 Jenkins 任务定义(触发令牌已脱敏)
+- **新增** Gitea 的声明式解析 — `argocd` / `jenkins` 各一份 selector-less Service + Endpoints,集群内 `gitea` 不再依赖宿主机 docker DNS
+- **修复** 控制面宿主重启后**静默失忆** — Gitea 容器定义 / `gitea` 解析来源 / Jenkins 任务与凭据,三处一起入 Git(见 D18、P26)
+- **修复** Jenkins init `CrashLoopBackOff` — 删 Pod 让 StatefulSet 重建即恢复;根因是 emptyDir 里的半截插件下载状态
+- **修复** webhook 变量与请求原文进构建日志 — `printPostContent` / `printContributedVariables` 由 `true` 改 `false`
+- **修复** buildah 构建无缓存(前半) — `/var/lib/containers` 从 `emptyDir` 换 PVC `jenkins/buildah-storage`;Jenkins 自身那两处见 D21
+- **变更** `Lint` stage 更名并升级为 `Test` — 真跑测试,而不是语法检查
+- **变更** `post{success/failure}` 从 `echo` 改为真投递告警;顺带修掉日志里那句 `流水线成功: null`
+- **变更** 不再把「集群内 `github.com` 的 NodeHosts 条目」当历史残留 — 实测它在承担职责(见 P25)
+- **记录** 新增踩坑 P24–P27、决策 D18–D21
+
 ## [2.0.0] — 2026-06-21
 
 ### Added
