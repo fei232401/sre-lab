@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: exporter
-        image: k3d-sre-registry:5000/sre-lab/ollama-exporter:e469f7f
+        image: k3d-sre-registry:5000/sre-lab/ollama-exporter:a14ce79
         ports:
         - name: metrics
           containerPort: 9101
