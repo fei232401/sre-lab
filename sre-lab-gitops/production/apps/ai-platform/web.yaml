@@ -41,20 +41,27 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          # 与 api 的差别：nginx 监听的是 80（特权端口），所以不能 runAsNonRoot，
-          # 改成「以 root 起，但把 capabilities 全部丢掉、只留 NET_BIND_SERVICE」。
-          # 效果等价于「只能绑低端口，别的什么都干不了」，是 nginx 场景的常规姿势。
+          # 与 api 的差别：nginx master 以 root 起，再把 worker 降到 uid 101。
+          # 因此不能照抄 api 的「drop ALL + 只留 NET_BIND_SERVICE」——那样 nginx
+          # 会在启动时死在这里（本项目实测的原始报错）：
+          #   nginx: [emerg] chown("/var/cache/nginx/client_temp", 101) failed (1: Operation not permitted)
+          # 需要的这 5 个能力是**从进程行为反推出来的**，不是抄模板：
+          #   CHOWN        给缓存目录改属主（上面那条报错）
+          #   SETUID/SETGID  把 worker 降到 nginx 用户
+          #   DAC_OVERRIDE 越过目录权限写缓存/日志
+          #   NET_BIND_SERVICE  绑 80 这个特权端口
+          # 丢掉的是 NET_RAW / MKNOD / SYS_CHROOT / SETPCAP / SETFCAP / AUDIT_WRITE / FOWNER 等，
+          # 这才是这条规则真正的收益。
           #
-          # ⚠️ 这两个字段必须放在**容器**级 securityContext 里，不能放 Pod 级。
-          # `allowPrivilegeEscalation` 和 `capabilities` 都**不是** PodSecurityContext 的字段；
-          # 放错层级时 API server 会**静默裁掉**它们（不报错），于是「清单里有、实际没有」，
-          # ArgoCD 会永远 OutOfSync。本项目实测踩过：web.yaml 放错层级 → 该 Deployment 一直 OutOfSync。
+          # ⚠️ 这两个字段必须放**容器**级：`allowPrivilegeEscalation` 与 `capabilities`
+          # 都**不是** PodSecurityContext 的字段；放 Pod 级时 API server 会**静默裁掉**
+          # （不报错），于是「清单里有、实际没有」，ArgoCD 会永远 OutOfSync（同样实测踩过）。
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
-              add: ["NET_BIND_SERVICE"]
+              add: ["CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID", "NET_BIND_SERVICE"]
           volumeMounts:
             # readOnlyRootFilesystem 下 nginx 仍要写这三处，用 emptyDir 顶掉
             - name: cache
