@@ -44,7 +44,7 @@ spec:
         runAsGroup: 1000
       containers:
         - name: router
-          image: k3d-sre-registry:5000/platform/ai-infra-platform-router:baa5308
+          image: k3d-sre-registry:5000/platform/ai-infra-platform-router:f189ee1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
