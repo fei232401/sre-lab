@@ -1,0 +1,124 @@
+# platform 入口层（web）在生产命名空间的落地清单。
+#
+# 和 api.yaml 一样，这是「CI 构建 → 写回镜像 tag → ArgoCD 收敛」的收敛终点。
+# image 那一行的 tag 由 Jenkins 的 Update GitOps 阶段 sed 改写，平时不要手工改。
+#
+# 交付形态与 api 不同：产物是**静态文件**，运行容器是 nginx。
+# 因此这里多了一层「反向代理」的职责 —— 见下方 nginx 的注释。
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-infra-platform-web
+  namespace: ai-platform
+  labels:
+    app: ai-infra-platform-web
+    app.kubernetes.io/name: ai-infra-platform-web
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-infra-platform-web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: ai-infra-platform-web
+    spec:
+      nodeSelector:
+        node-role: cpu
+      terminationGracePeriodSeconds: 20
+      securityContext:
+        # 与 api 的差别：nginx 监听的是 80（特权端口），所以不能 runAsNonRoot，
+        # 改成「以 root 起，但把 capabilities 全部丢掉、只留 NET_BIND_SERVICE」。
+        # 效果等价于「只能绑低端口，别的什么都干不了」，是 nginx 场景的常规姿势。
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+          add: ["NET_BIND_SERVICE"]
+      containers:
+        - name: web
+          image: k3d-sre-registry:5000/platform/ai-infra-platform-web:15b35a5
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          securityContext:
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            # readOnlyRootFilesystem 下 nginx 仍要写这三处，用 emptyDir 顶掉
+            - name: cache
+              mountPath: /var/cache/nginx
+            - name: run
+              mountPath: /var/run
+            - name: tmp
+              mountPath: /tmp
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+            successThreshold: 1
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+      volumes:
+        - name: cache
+          emptyDir: {}
+        - name: run
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-infra-platform-web
+  namespace: ai-platform
+  labels:
+    app: ai-infra-platform-web
+    app.kubernetes.io/name: ai-infra-platform-web
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: ai-infra-platform-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+#
+# 关于「怎么从宿主机打开这个页面」：
+#   本集群没有任何 ingress 能从 Windows 侧直达 —— traefik 的 NodePort(31085)
+#   没做 k3d 端口映射，30080/31085 从宿主机都是 CLOSED。所以这里**刻意不放 IngressRoute**：
+#   放了也访问不到，只会留下一个「看起来能用其实不通」的入口。
+#
+#   真正可用的本地查看方式是 port-forward（在 WSL 里执行）：
+#     kubectl -n ai-platform port-forward svc/ai-infra-platform-web 8080:80
+#   然后浏览器开 http://localhost:8080 —— nginx 会把 /api/ 反代到集群内的 api Service，
+#   所以不需要再单独 forward 后端。
