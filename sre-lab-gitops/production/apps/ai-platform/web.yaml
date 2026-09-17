@@ -35,7 +35,7 @@ spec:
       terminationGracePeriodSeconds: 20
       containers:
         - name: web
-          image: k3d-sre-registry:5000/platform/ai-infra-platform-web:0ae4d76
+          image: k3d-sre-registry:5000/platform/ai-infra-platform-web:81043a8
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
