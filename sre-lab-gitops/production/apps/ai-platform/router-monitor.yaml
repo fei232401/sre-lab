@@ -1,0 +1,93 @@
+# 把「决策执行器」（router）接进 Prometheus。
+#
+# 为什么单独需要一份：**Prometheus 是 Pull 模型**——它主动来抓 `/metrics`。
+# 光在服务里暴露端点没用，还得告诉 Prometheus「去抓谁」。这就是 ServiceMonitor 的职责：
+# 它是 Prometheus Operator 的 CRD，描述「用哪个 selector 找 Service、抓哪个端口、多久抓一次」。
+#
+# 这也解释了一个常见困惑：**为什么新服务加完 `/metrics` 却看不到数据**——
+# 因为没人告诉 Prometheus 去抓它。
+#
+# ⚠️ 已知的埋点盲点（诚实标注）：
+#   `POST /v1/route` 在「候选为空 / 全被排除」时会提前返回 503，
+#   **这条路径没有走到指标上报**（指标是在决定后端之后才记的）。
+#   所以下面的告警**覆盖不了"没有可用后端"这件事** —— 它只能靠日志。
+#   修法是把计数点前移到"进入 route 就计数"，但那要把 main.py 再拆一次（当前 294 行）。
+#   这里不修，而是**写下来**：指标没覆盖的分支，告警也覆盖不了。
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ai-infra-platform-router-monitor
+  namespace: ai-platform
+  labels:
+    release: monitoring
+    app.kubernetes.io/name: ai-infra-platform-router
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  namespaceSelector:
+    matchNames:
+      - ai-platform
+  selector:
+    matchLabels:
+      app: ai-infra-platform-router
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ai-infra-platform-router-alerts
+  namespace: ai-platform
+  labels:
+    release: monitoring
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  groups:
+    - name: ai-platform.router
+      rules:
+        # 后端真的调不通了。注意用 increase 而不是直接比大小：
+        # 计数器是**单调递增**的，比绝对值没有意义。
+        - alert: RouterUpstreamErrors
+          expr: increase(router_upstream_errors_total[5m]) > 0
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: router 调真实后端失败
+            description: 5 分钟内出现 {{ $value }} 次后端调用失败（后端可能挂了，或 engine 与 URL 不匹配）
+
+        # 生成成功但「决策没写回 PG」。这条比上一条更阴险：
+        # **功能正常，但观测数据出现空洞** —— 事后统计会偏低，而且不报错。
+        - alert: RouterRecordFailures
+          expr: increase(router_record_failures_total[10m]) > 0
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: router 未能把请求/决策写回控制层
+            description: 10 分钟内 {{ $value }} 次写回失败。生成结果是有效的，但这次请求没进统计
+
+        # 端到端耗时 P95。直方图的 _bucket 是累计计数，
+        # 所以要先 rate 再 histogram_quantile（顺序反了会得到无意义的值）。
+        - alert: RouterLatencyHigh
+          expr: histogram_quantile(0.95, sum by (le) (rate(router_route_duration_seconds_bucket[5m]))) > 30
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: router 端到端 P95 超过 30 秒
+            description: 当前 P95 = {{ $value }}s。可能是后端冷加载、或候选被选到了慢后端
+
+        # 连续没有候选 = 该模型没有任何可用后端。注意这条**只能反映"走过生成路径"的情况**，
+        # 候选为空的 503 不在这里（见文件头注释）。
+        - alert: RouterNoCandidatesSeen
+          expr: increase(router_candidates_count_bucket{le="0"}[30m]) > 0
+          for: 0m
+          labels:
+            severity: info
+          annotations:
+            summary: router 出现过候选数为 0 的请求
+            description: 说明该模型下没有绑定任何可用实例
