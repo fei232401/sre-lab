@@ -43,7 +43,7 @@ spec:
         runAsGroup: 1000
       containers:
         - name: api
-          image: k3d-sre-registry:5000/platform/ai-infra-platform-api:a737d41
+          image: k3d-sre-registry:5000/platform/ai-infra-platform-api:913e57a
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
