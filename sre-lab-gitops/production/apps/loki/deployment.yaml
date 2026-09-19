@@ -130,8 +130,6 @@ kind: Service
 metadata:
   name: loki
   namespace: logging
-  annotations:
-    sre-lab.io/e2e-verify: "2026-09-20-gitea-link-restored"
 spec:
   selector:
     app: loki
