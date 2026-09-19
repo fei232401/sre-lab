@@ -158,7 +158,29 @@ dial tcp: lookup gitea on 10.43.0.10:53: no such host
 | 它的**名字解析**必须由**集群内的声明式对象**提供 | 原先靠宿主机 docker DNS 的跨层副作用,容器一停即 `NXDOMAIN`。现改为在 `argocd` / `jenkins` 各放一份 selector-less Service + Endpoints |
 | 它**不能是裸容器、无载体定义** | `RestartPolicy` 必须 `unless-stopped`,且有幂等重建脚本(`08_重建/gitea_up.sh`) |
 
-> ⚠️ **一处新的、更隐蔽的失效可能**:Endpoints 里硬编码了 Gitea 容器的 IP。容器重建换了 IP → **k8s DNS 会抢先返回一个死端点**,报的是连接失败而不是 `NXDOMAIN`,**比原来更难看出来**。所以 `gitea_up.sh` 每次跑都会按**实际容器 IP** 重放这两个对象并核对。
+> ⚠️ **2026-09-19:上面这句"更隐蔽的失效可能"真的发生了。**
+> 宿主重启后 docker IPAM 重排,Gitea 从 `172.18.0.8` 漂到 `172.18.0.5`,而 `172.18.0.8` 被
+> k3s 节点 `k3d-ai-cluster-server-0` 占了 —— 于是 Endpoints 指向了一个**活着但不是 Gitea** 的地址。
+> 6 条 Application 全部 `Sync=Unknown`,`ComparisonError: dial tcp 10.43.249.239:3000: connect: connection refused`。
+> **`gitea_up.sh` 的"每次跑都按实际容器 IP 重放并核对"没有救到它 —— 因为没人跑那个脚本。**
+> 靠"记得跑一个脚本"来兜底的方案,失效模式就是"忘了跑",而且不告警。
+
+> ✅ **现行做法(2026-09-20):Endpoints 从此不写容器 IP。**
+> 指向 **k3d 网络网关 `172.18.0.1` + 宿主的发布端口 `3001`**(Service 端口仍是 `3000`,映射差异被 Endpoints 吸收)。
+> 网关由 docker 按网段固定分配,不随容器创建顺序变;容器怎么重建、IP 怎么漂都不影响。
+> 代价与残留失效模式:一旦 Gitea 不再发布宿主端口,这条 Endpoints 立刻失效**且集群侧不报错**。
+> 所以 `gitea_up.sh` 第 4 步改成**从集群内部实测** `http://gitea:3000/api/v1/version`,不通就红字退出。
+>
+> 手工核对(重建后 / 重启后都该跑一遍):
+> ```bash
+> # 1 看声明对象
+> kubectl -n argocd get endpoints gitea -o jsonpath='{.subsets[0].addresses[0].ip}:{.subsets[0].ports[0].port}{"\n"}'
+> # 2 从集群里实测(这才是 ArgoCD/Jenkins 走的路径)
+> kubectl -n argocd run gitea-probe-$RANDOM --rm -i --restart=Never --image=busybox:1.36 \
+>   --timeout=45s -- wget -q -O- -T 8 http://gitea:3000/api/v1/version
+> # 3 看 Application 有没有 Unknown
+> kubectl -n argocd get applications
+> ```
 
 **想确认 ArgoCD 的 Git 源是死是活,查这一处就够:**
 
