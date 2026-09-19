@@ -1,0 +1,213 @@
+# platform 决策执行器（router）在生产命名空间的落地清单。
+#
+# 它的位置：夹在「控制层的决策」与「真实推理后端」之间。
+#   控制层算排名 + 记决策，但**不调用**后端；
+#   ollama / vLLM 能生成，但**没人调**；
+#   router 就是把这两头接起来的那一刀。
+#
+# 与 api / web 的清单相比，它有两处不同：
+#   1. **不需要任何 Secret** —— 它不连库，对控制层用的是调用方传来的 X-API-Key（透传鉴权）
+#   2. readiness 会去探控制层 —— 依赖不在就不该接流量，所以控制层抖动时 router 会短暂 NotReady
+#
+# image 那一行的 tag 由 Jenkins 的 Update GitOps 阶段 sed 改写，平时不要手工改。
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-infra-platform-router
+  namespace: ai-platform
+  labels:
+    app: ai-infra-platform-router
+    app.kubernetes.io/name: ai-infra-platform-router
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-infra-platform-router
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: ai-infra-platform-router
+    spec:
+      nodeSelector:
+        node-role: cpu
+      terminationGracePeriodSeconds: 20
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        # 加 fsGroup 是为了让下面那个 otel-pkgs 的 emptyDir 对 uid 1000 可写 ——
+        # init 容器要以非 root 身份 pip install 到它里面。
+        # 不加的话 pip 会 Permission denied（而 Pod 级 securityContext 里
+        # runAsNonRoot=true 又要求它必须以非 root 跑）。
+        fsGroup: 1000
+      # 链路追踪的依赖怎么进容器：不在镜像里重新构建，而是在 init 容器里 pip install
+      # 到一块 emptyDir，再由主容器通过 PYTHONPATH 加载。
+      # 这是"不重建镜像就给已有服务加埋点"的做法（OTel Operator 的自动注入也是这个原理）。
+      # 代价：Pod 每次重建都要重新 pip install 一次（几十秒）。正式做法是把依赖写进
+      # requirements.txt 由 CI 构建进镜像 —— 见教材《第1册 05》§"两种落地方式"。
+      initContainers:
+        - name: otel-install
+          image: python:3.11-slim
+          command:
+            - sh
+            - -c
+            - >-
+              pip install --no-cache-dir --target=/otel
+              --index-url https://pypi.tuna.tsinghua.edu.cn/simple
+              "opentelemetry-distro[otlp]"
+              opentelemetry-instrumentation-fastapi
+              opentelemetry-instrumentation-httpx
+          env:
+            - name: HOME
+              value: /tmp
+          volumeMounts:
+            - name: otel-pkgs
+              mountPath: /otel
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+      containers:
+        - name: router
+          image: k3d-sre-registry:5000/platform/ai-infra-platform-router:f189ee1
+          imagePullPolicy: IfNotPresent
+          # 用 opentelemetry-instrument 作为入口来包装 uvicorn：
+          # 它会在进程启动时加载自动埋点，不需要改业务代码。
+          # 原来镜像是 CMD ["uvicorn", "src.main:app", ...]，这里只是把它包了一层。
+          command:
+            - /otel/bin/opentelemetry-instrument
+            - uvicorn
+            - src.main:app
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8000"
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: APP_ENV
+              value: production
+            # 控制层的 Service FQDN。用完整名字：短名只在同命名空间内可解析
+            # （这里同命名空间，但保持与 api 的 DSN 一致的口径，避免以后搬家踩坑）
+            - name: CONTROL_PLANE_URL
+              value: http://ai-infra-platform-api.ai-platform.svc.cluster.local:8000
+            - name: DEFAULT_POLICY
+              value: weighted_random
+            - name: DEFAULT_MAX_TOKENS
+              value: "128"
+            # 后端生成可能很慢（CPU 上的 3B 实测 11.87s，冷加载更久），超时要给够
+            - name: REQUEST_TIMEOUT_SECONDS
+              value: "240"
+            # —— 链路追踪 ——
+            # PYTHONPATH 指向 init 容器装好依赖的那块 emptyDir
+            - name: PYTHONPATH
+              value: /otel
+            # opentelemetry-instrument 可能想往 HOME 写东西，而根文件系统是只读的
+            - name: HOME
+              value: /tmp
+            - name: OTEL_SERVICE_NAME
+              value: ai-infra-platform-router
+            - name: OTEL_TRACES_EXPORTER
+              value: otlp
+            # 用 http/protobuf 而不是 grpc：走 Collector 的 4318 端口，
+            # 避免为了 gRPC 再拉一堆依赖（镜像里没装 grpcio 之外的东西）
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: http/protobuf
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector.monitoring.svc.cluster.local:4318
+            # 资源属性会作为 span 的标签，用来区分"哪个环境、哪个版本"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.namespace=ai-platform,deployment.environment=k3d-local
+            # 探针和 /metrics 每 10~30 秒被扫一次，把它们也埋进 trace 只会淹没真实请求。
+            # 这是"采样"之外最实用的一种降噪手段。
+            - name: OTEL_PYTHON_EXCLUDED_URLS
+              value: metrics,healthz,readyz
+            - name: OTEL_TRACES_SAMPLER
+              value: parentbased_always_on
+          # ⚠️ 这两个字段必须在**容器**级。写进 Pod 级 securityContext 会被 API server
+          # 静默裁掉（不报错），于是"清单里有、集群里没有"→ ArgoCD 永远 OutOfSync。
+          # 本项目在 web 的清单上实测踩过一次（踩坑 P37）。
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: otel-pkgs
+              mountPath: /otel
+              readOnly: true
+          readinessProbe:
+            # 就绪 = 控制层可达。**这不是形式**：router 的每一次请求都要先问控制层拿决策，
+            # 控制层不在，router 接了流量也只能返回 502。
+            httpGet:
+              path: /readyz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            # 存活只看进程还在不在，不探控制层 —— 依赖抖一下不该把 Pod 杀掉重启
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+            successThreshold: 1
+          resources:
+            requests:
+              cpu: 50m
+              memory: 96Mi
+            limits:
+              cpu: 500m
+              # 从 256Mi 提到 384Mi：OTel SDK 会常驻一批内存做 batch 缓冲。
+              # 提到 384 是因为留着 256 会有 OOMKilled 的风险（实测未发生，但余量不够）。
+              memory: 384Mi
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        # OTel 依赖的落地位置。sizeLimit 是保险丝：装不下就报错，不要默默吃掉节点内存
+        - name: otel-pkgs
+          emptyDir:
+            sizeLimit: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-infra-platform-router
+  namespace: ai-platform
+  labels:
+    app: ai-infra-platform-router
+    app.kubernetes.io/name: ai-infra-platform-router
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: ai-infra-platform-router
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP
+#
+# 浏览器怎么够到它：经 web 的 nginx 再加一条反代（`/v1/` → 本 Service）。
+# 宿主机到不了任何 ClusterIP，所以「前端 → router」这一跳必须复用 web 那个 Pod 的 nginx。

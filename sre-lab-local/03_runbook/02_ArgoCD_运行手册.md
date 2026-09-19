@@ -137,6 +137,38 @@ kubectl --context k3d-ai-cluster -n argocd annotate application <app> \
 
 > **规律:`Synced` 是一个相对量,不是一个绝对量。** 凡是以"当前状态 == 期望状态"表述的健康信号,都要先问一句"期望状态是谁的期望、是哪个时刻的期望"。
 
+### ⚠️ ArgoCD 的 Git 源:**一个必须能脱离集群存活的东西**
+
+6 个 Application 的 `source.repoURL` 都是 `http://gitea:3000/fei232401/sre-lab.git`。也就是说 —— **ArgoCD 的全部收敛能力,押在一个集群外的 Git 服务上。**
+
+2026-09-16 宿主重启后那个 Git 服务没了,6 条 Application 全部变成:
+
+```
+ComparisonError: failed to list refs: Get "http://gitea:3000/fei232401/sre-lab.git/info/refs?service=git-upload-pack":
+dial tcp: lookup gitea on 10.43.0.10:53: no such host
+```
+
+> **关键认知:`Unknown` 期间发生的事不是"集群坏了",而是"没人再看它了"。** 工作负载照常跑,但**任何漂移都不会被纠正**,而且**不会有人收到通知**。
+
+**三条设计结论(2026-09-17 起,依据 D18):**
+
+| 结论 | 理由 |
+|------|------|
+| Git 服务必须**留在集群外** | 放进被它管理的集群 = **集群一灭,你连"从 Git 恢复"都做不到**(更深的自锁) |
+| 它的**名字解析**必须由**集群内的声明式对象**提供 | 原先靠宿主机 docker DNS 的跨层副作用,容器一停即 `NXDOMAIN`。现改为在 `argocd` / `jenkins` 各放一份 selector-less Service + Endpoints |
+| 它**不能是裸容器、无载体定义** | `RestartPolicy` 必须 `unless-stopped`,且有幂等重建脚本(`08_重建/gitea_up.sh`) |
+
+> ⚠️ **一处新的、更隐蔽的失效可能**:Endpoints 里硬编码了 Gitea 容器的 IP。容器重建换了 IP → **k8s DNS 会抢先返回一个死端点**,报的是连接失败而不是 `NXDOMAIN`,**比原来更难看出来**。所以 `gitea_up.sh` 每次跑都会按**实际容器 IP** 重放这两个对象并核对。
+
+**想确认 ArgoCD 的 Git 源是死是活,查这一处就够:**
+
+```bash
+kubectl --context k3d-ai-cluster -n argocd get applications \
+  -o custom-columns='NAME:.metadata.name,SYNC:.status.sync.status,REV:.status.sync.revision'
+```
+
+只要出现 `Unknown`,先去看 `status.conditions` 里的 `ComparisonError` —— 那多半就是 Git 源的问题。
+
 ---
 
 ## 四、`monitoring-app` 的 apply 顺序(⚠️ 曾有硬约束,**现已解除**)
@@ -219,3 +251,4 @@ ArgoCD 上游 chart **完全不设 `resources`**(全部 `{}` = BestEffort QoS)�
 | 日期 | 变更 |
 |---|---|
 | 2026-09-16 | 建立。收录多集群纪律、15s 超时行为、目录语义、apply 顺序约束 |
+| 2026-09-17 | 新增「ArgoCD 的 Git 源:一个必须能脱离集群存活的东西」——记录 6 条 Application 全 `Unknown` 的机制、三条设计结论(D18)、以及 Endpoints 硬编码 IP 带来的新失效面 |

@@ -1,0 +1,154 @@
+# platform 数据层（PostgreSQL）在集群内的交付清单。
+#
+# 为什么是「搬进集群」而不是「把集群外的 PG 投影成 Service 名」：
+#   本来打算照 gitea 的做法用 selector-less Service + 手工 Endpoints，把 docker 容器
+#   pg-platform 投影成集群内的名字 postgres。Service 建出来了，Endpoints 却没了 ——
+#   ArgoCD 默认的 argocd-cm 里 resource.exclusions 把 Endpoints/EndpointSlice 整个排除，
+#   App 的 conditions 原文：Resource /Endpoints postgres is excluded in the settings。
+#   也就是说：**在这个 ArgoCD 上，Endpoints 根本没法声明式交付。**
+#   于是改走正路：把 db 层真正部署进集群。普通 Service + selector，ArgoCD 原生可管，
+#   全链路一个写死的 IP 都不需要，顺带让 db 仓的 schema 契约有了真正的交付目标。
+#   docker 上的 pg-platform 退回它本来的角色：本地开发/测试库。
+#
+# 两个环境的分工（别混）：
+#   本地开发/本机 pytest  -> docker 容器 pg-platform，127.0.0.1:5432
+#   集群内交付（本文件）  -> ai-platform/postgres，Service 名 postgres，数据在 PVC
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  namespace: ai-platform
+  labels:
+    app: postgres
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: ai-platform
+  labels:
+    app: postgres
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/component: datastore
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  replicas: 1
+  # 必须是 Recreate：PVC 是 ReadWriteOnce，滚动更新会出现新旧两个 Pod 抢同一个卷，
+  # 新的永远起不来（卡在 Multi-Attach / 目录被占用）。单实例数据库一律 Recreate。
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      nodeSelector:
+        node-role: cpu
+      securityContext:
+        # postgres:16-alpine 里的 postgres 用户是 uid/gid 70。
+        # fsGroup 让 kubelet 把卷的组改成 70，数据目录才写得进去。
+        fsGroup: 70
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          # 与 docker 侧 pg_up.sh 用同一组参数，两个环境行为一致，排查时不用换脑子
+          args:
+            - -c
+            - shared_buffers=256MB
+            - -c
+            - max_connections=120
+            - -c
+            - work_mem=8MB
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_PASSWORD
+            # 挂载点在父目录（卷根），官方镜像要求 PGDATA 指到子目录，
+            # 否则会因为父目录里的 lost+found 之类的东西拒绝 initdb
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          securityContext:
+            runAsUser: 70
+            runAsGroup: 70
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres"]
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: postgres-data
+        - name: initdb
+          secret:
+            secretName: postgres-credentials
+            # 建角色/建库的 SQL 也走封存 Secret，不落明文到 Git
+            items:
+              - key: init.sql
+                path: 10-init.sql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: ai-platform
+  labels:
+    app: postgres
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/component: datastore
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  type: ClusterIP
+  # 普通 Service + selector —— 这是 ArgoCD 能原生管的那一半
+  selector:
+    app: postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+      protocol: TCP

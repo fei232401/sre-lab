@@ -1,0 +1,137 @@
+# platform 控制层（api）在生产命名空间的落地清单。
+#
+# 这是「CI 构建 → 写回镜像 tag → ArgoCD 收敛」这条链的**收敛终点**：
+# image 那一行的 tag 由 Jenkins 的 Update GitOps 阶段 sed 改写，
+# 所以平时不要手工改它 —— 手改会被下一次构建覆盖，而且会让「当前跑的是哪个 commit」
+# 这条信息失真。
+#
+# 认证口径：APP_ENV=production + AUTH_REQUIRED=true。
+#   src/main.py 里有一条硬约束：production 必须开认证，否则启动即 RuntimeError。
+#   这是「配置错了就起不来」而不是「配置错了悄悄裸奔」，属于 fail-fast 设计。
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-infra-platform-api
+  namespace: ai-platform
+  labels:
+    app: ai-infra-platform-api
+    app.kubernetes.io/name: ai-infra-platform-api
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-infra-platform-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: ai-infra-platform-api
+    spec:
+      # agent-1 打了 node-role=cpu，和 ollama 同一台；agent-0 的 requests 已经压得比较满
+      nodeSelector:
+        node-role: cpu
+      terminationGracePeriodSeconds: 20
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: api
+          image: k3d-sre-registry:5000/platform/ai-infra-platform-api:a737d41
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: APP_ENV
+              value: production
+            - name: LOG_LEVEL
+              value: INFO
+            - name: SERVER_HOST
+              value: 0.0.0.0
+            - name: SERVER_PORT
+              value: "8000"
+            - name: AUTH_REQUIRED
+              value: "true"
+            - name: EXPECTED_SCHEMA_VERSION
+              value: "1"
+            # postgres 这个名字由同目录的 postgres-stack.yaml 提供：
+            # Deployment + **带 selector 的普通 Service**，Endpoints 由控制面自动生成。
+            # 早先试过「selector-less Service + 手工 Endpoints」把集群外的 PG 投影进来，
+            # 但 ArgoCD 默认在 resource.exclusions 里排除了 Endpoints，这条清单晾不进去。
+            # DSN 用完整 FQDN：短名只在同命名空间内可解析。
+            - name: DATABASE_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: ai-platform-api-secret
+                  key: DATABASE_DSN
+            - name: SECRET_PEPPER
+              valueFrom:
+                secretKeyRef:
+                  name: ai-platform-api-secret
+                  key: SECRET_PEPPER
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            # 存活只看进程是否还在服务，不连库 —— 库抖一下不该把 Pod 杀掉重启
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+            successThreshold: 1
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-infra-platform-api
+  namespace: ai-platform
+  labels:
+    app: ai-infra-platform-api
+    app.kubernetes.io/name: ai-infra-platform-api
+    app.kubernetes.io/part-of: ai-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: ai-infra-platform-api
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP

@@ -207,6 +207,77 @@ controller:
 
 > **这一条是资源纪律,不是优化。** `agent-0` 是唯一带 GPU 的节点、长期高负载;CI 构建**没有任何理由**占用它。按"资源特征"给工作负载选节点,是这份清单里最直接体现 D7 决定的一处。
 
+### 流水线各 stage(2026-09-17 起)
+
+| stage | 做什么 | 失败会怎样 |
+|-------|--------|-----------|
+| Checkout | 拉 `ci/Jenkinsfile` 所在分支 | 直接失败 |
+| Trigger Guard | 比对 `before..after` 的变更路径,判断这次推送要不要构建 | 跳过构建,`SUCCESS` |
+| Resolve Tag | 用提交短 SHA 生成镜像 tag | 失败 |
+| **Test** | `python -m unittest discover` 跑 `03-ollama-exporter/test_exporter.py`(14 个用例) | **失败 → 不进 Build** |
+| Build | buildah 构建镜像,层进 `jenkins/buildah-storage` PVC | 失败 |
+| Push | 推到 `k3d-sre-registry:5000` | 失败 |
+| Verify In Registry | 回查 `tags/list`,确认镜像真的登记了 | 失败 |
+| Update GitOps | 把新 tag 写回 `sre-lab-gitops/production/monitoring/ollama-exporter.yaml` 并 push | 失败 |
+
+> `Test` stage 原名 `Lint`,只做 `python -m py_compile`。**语法通过不等于行为正确**——它拦不住任何逻辑错误,所以换成了真测试。为什么选标准库 `unittest` 而不是 pytest,见 D20。
+>
+> `Build` 阶段的 `/var/lib/containers` 原先挂的是 `emptyDir`,**每次构建从零开始、层无缓存**。2026-09-17 换成 PVC `jenkins/buildah-storage`(10Gi,`local-path`)。挂载、属主(`uid=0 gid=1000 mode=777`)、可写性已实测。
+
+### 失败通知(2026-09-17 起)
+
+`post{failure}` 调用 `ci/notify_alertmanager.py fire`,往 Alertmanager 投一条 `alertname=JenkinsPipelineFailed` 的告警;`post{success}` 投**同标签**的已解决告警,把之前那条关掉。
+
+```
+Jenkins Pod → http://monitoring-kube-prometheus-alertmanager.monitoring.svc:9093/api/v2/alerts
+            → AlertmanagerConfig sre-lab-alerting 的 email receiver
+            → smtp.qq.com:465 → 599512147@qq.com
+```
+
+> ⚠️ **这条链路有一个静默失效点。** 邮件接收端依赖 Secret `alertmanager-smtp`,而它来自 SealedSecret。**sealed-secrets 的解封私钥不在 Git 里**——私钥一丢,密码就解不开,**告警没人收,而且没人会知道**。请定期确认这件事。
+
+> 告警的 `labels` 里**刻意不放 build 号和版本号**(它们放 `annotations`)。原因见 P27:labels 是告警的**身份**,往里塞易变值会让告警**永远关不掉**。
+
+### 怎么证明「失败通知真的到人」(四步法)
+
+这套链路有三个**静默失效点**(sealed-secrets 私钥、SMTP 授权码、路由匹配),而且**每一处坏掉的表现都是"什么都不发生"**。所以要**主动去证**,不能等它自己暴露。
+
+**判据按可靠性排序,别用日志当第一判据(原因见 P28)。**
+
+```bash
+NS=monitoring
+AM=http://monitoring-kube-prometheus-alertmanager.monitoring.svc:9093
+
+# ① 告警进没进 Alertmanager?（filter 要 URL 编码引号）
+curl -s "$AM/api/v2/alerts?filter=alertname%3D%22JenkinsPipelineFailed%22"
+
+# ② 它被路由到了哪个 receiver?—— 看告警对象自己的 receivers 字段
+#    期望: [{"name":"monitoring/sre-lab-alerting/email"}]
+
+# ③ 通知真的发出去了吗?—— 用计数器,不用日志
+curl -s "$AM/metrics" | grep -E 'alertmanager_notifications_(total|failed_total)\{.*integration="email"'
+#    判据: notifications_total - failed_total 的增量 > 0
+
+# ④ 配置是不是我以为的那份?（prometheus-operator 存的是 .gz,要 gunzip）
+kubectl --context k3d-ai-cluster -n $NS get secret \
+  alertmanager-monitoring-kube-prometheus-alertmanager-generated \
+  -o jsonpath='{.data.alertmanager\.yaml\.gz}' | base64 -d | gunzip
+```
+
+> ⏱️ **观测窗口必须 > `group_interval`(本仓库配的是 `5m`)。** 刚投完告警的 30~60 秒内读计数器,**大概率还是 0**,那是正常的,不是故障(P29)。
+>
+> ✅ 本仓库 2026-09-17 实测:`notifications_total|email = 8`、`failed_total|email = 0`(Alertmanager 进程 71 分钟内)。同时告警状态能正确地在 `active → 消失` 之间往返,说明 `send_resolved` 也配得上对(P27)。
+
+**还有个更彻底的证法(未做)**:让一次构建**真的失败**一次,看 failure 分支是否真的把告警打进来。本仓库的三次构建(#23/#24/#25)**全都成功**,所以 `post{failure}` 这条分支**至今没被真实触发过一次**——它和 `post{success}` 共用同一段投递代码,但**"共用代码"是推演,不是实测**。记在这里,当作已知的验证缺口。
+
+### 控制面已可从 Git 重建
+
+任务定义活体导出在 `ci/job-config.xml`(触发令牌已脱敏),完整重建顺序见 `08_重建/CI_重建清单.md`。
+
+> 控制面此前有**三处不在 Git**:Gitea 容器定义、`gitea` 的解析来源、Jenkins 任务与凭据。宿主重启一次即**静默失忆**(P26)。现在这三处都入 Git 了。
+>
+> ⚠️ Jenkins 自身的 `plugin-dir` / `jenkins-cache` **仍然是 `emptyDir`** —— 所以**每次重启仍然要重下全部插件**(第四节那条纪律不变)。这笔债是**已知未还**,推迟的理由与代价见 D21。
+
 ---
 
 ## 六、本地镜像仓库(k3d registry)
@@ -253,3 +324,4 @@ curl -s -b "$COOKIE_JAR" \
 | 日期 | 变更 |
 |---|---|
 | 2026-09-16 | 建立。收录访问入口、两个 REST API 坑(crumb 会话绑定 / `json=` form 编码)、重启代价纪律、流水线任务信息、本地镜像仓库命令 |
+| 2026-09-17 | 补「怎么证明失败通知真的到人」四步法(precondition: 观测窗口 > group_interval)。对应踩坑 P28–P31、决策 D22 |

@@ -231,6 +231,26 @@ Pod=ollama-exporter-6ccf4fd9b9-2ldmg  镜像 tag=0d327c2  自报 revision=0d327c
 
 > **这张表本身就是结论**:上面这些东西**一个都不会报错**。它们不在,系统只是**安静地不工作** —— 这正是 `06_踩坑记录.md` P18 的形状,在整条链路上重演了很多次。
 
+### 📌 2026-09-17 更新:表 C 里有 5 行已经不再是「全丢」
+
+> 2026-09-16 宿主重启后,控制面整体死亡:ArgoCD 6 条 Application 全 `Unknown`、Jenkins init `CrashLoopBackOff`、Gitea 不见。事后复核确认**根因不是组件坏了,而是这张表** —— 表 C 里有 3 行恰好是控制面的命门。
+>
+> 完整诊断见 `06_踩坑记录.md` P24–P26,决策与代价见 `99_决策日志.md` D18–D21,**重建顺序见 `CI_重建清单.md`**。
+
+| 表 C 里的行 | 现状 |
+|---|---|
+| **Gitea 容器 + `gitea-data` 卷** | 容器定义已入 Git(`gitea_up.sh`,含 `--ip` 固定与 `RestartPolicy=unless-stopped`)。**卷内容仍不在 Git**(数据面),但 `GitHub fei232401/sre-lab` 是同一份内容的副本,可作恢复源 |
+| **Gitea 的存在性依赖 `RestartPolicy=no`** | 已改 `unless-stopped`;`gitea_up.sh` 每次跑都会校正回来 |
+| CoreDNS `NodeHosts` | 仍不在 Git。但关键名字(集群内 `gitea`)已改由**集群内的 Service + Endpoints** 提供(`manifests/gitea-endpoints.yaml`),不再依赖它 |
+| **Jenkins 任务 `sre-lab-ci`** | 定义已导出到 `ci/job-config.xml`(触发令牌已脱敏) |
+| **Jenkins 凭据 `gitea-webhook-token`** | **值仍在 Git 外**(刻意)。需在 Jenkins UI 手工录入,ID 必须是 `gitea-webhook-token` |
+
+> ⚠️ **顺带纠正本表的一处错误**:原先被当成"历史残留"的那条 `github.com` NodeHosts 条目,**其实在承担职责**(集群内要到 GitHub 靠它,插件与依赖下载要用)。判断标准很朴素:**把它拿走,看谁断。** 详见 P25。
+
+> **表 C 的正确读法没变**:列在上面的东西**一个都不会报错**。所以"哪些已经还了、哪些还欠着"这件事**必须定期重看,不能靠记忆**。
+>
+> 还欠着的里面最危险的一条:**Sealed Secrets 私钥**。它一丢,`alertmanager-smtp` 永久解不开 —— 而**"告警没人收"这件事本身不会报警**。
+
 ### 一处需要你拍板的设计岔口
 
 `production/bootstrap/root-app.yaml` **在 Git 里存在,但现场从未 apply**。也就是说设计意图是"App-of-Apps 自管",实际落地是"6 个 Application 手工 apply、自己不管自己"。
@@ -270,6 +290,36 @@ B 类问题。按仓库文件装 monitoring → 装出来的栈**少 5 个顶层
 
 ---
 
+## 七、⚠️ 读 `~/projects/sre-lab` 的 `git status` 之前,先读这一节
+
+WSL 里的 `~/projects/sre-lab` 是**编辑源**,不是发布源(D22)。它的 git 状态**长期是"脏"的**,而且**看起来比实际更糟**:
+
+```
+$ git rev-parse --short HEAD
+dea2f70                    ← 远端可能已经领先好几个提交
+$ git status --porcelain
+ 8 个 M + 6 项 ?? + 2 个只有 mode 变化的 M
+$ git status -sb
+## main...origin/main      ← 注意:没有 behind 标记
+```
+
+**两个必须知道的读取陷阱:**
+
+1. **它不 fetch** —— 所以 `status -sb` **永远不显示 behind**。它不知道远端走到哪了,**不能据此判断"本地是不是最新"**。
+2. **那堆 M / ?? 不等于"有未发布的改动"** —— 落盘通道是「改 UNC 上的文件 → 复制进 Windows 侧克隆 → commit → push」,**工作副本的 git 头不参与这条通道**。所以这里的"脏"是**设计的一部分**,不是待办。
+
+**怎么判断"到底有没有东西没发布"?** 别看 `git status`,看**远端**:
+
+```bash
+git ls-remote http://127.0.0.1:3001/fei232401/sre-lab.git refs/heads/main
+```
+
+**为什么不干脆 `git pull` 对齐?** 因为**收益为零、代价为正**:这里没有任何独有内容,而 `pull` 会让 15 个已修改/未跟踪文件与入站改动**正面对撞**,冲突还要在 9p 文件系统上解。完整推理与代价见 D22。
+
+---
+
 ## 变更记录
 
 - 2026-09-16:建立。M5 收口产出:`重建.sh`(分阶段重建 + 三项静默失败验收)、本 README(验证状态 / 顺序理由 / 重建对象清单 / 三个失败点)
+- 2026-09-17:表 C 复核更新。新增「表 C 里有 5 行已经不再是『全丢』」;纠正 `github.com` NodeHosts 条目被误判为历史残留;**新增 `gitea_up.sh`(含集群侧解析对象)与 `CI_重建清单.md`**。依据 P24–P26 / D18–D21
+- 2026-09-17:新增第七节「读 `git status` 之前先读这一节」—— 工作副本是编辑源、长期显脏、且不 fetch 所以不显示 behind。依据 D22 / P28–P31
